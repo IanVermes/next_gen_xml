@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="https://www.jjs-online.net" xmlns="https://www.jjs-online.net">
+
+<!-- definition of root element -->
+
+  <xs:element name="document">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="article"/>
+        <xs:element ref="book-review"/>
+        <xs:element ref="books-received"/>
+      </xs:choice>
+      <xs:attribute name="docid" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+
+<!-- definition of major elements: article and review  -->
+
+  <xs:element name="article">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="volume"/>
+        <xs:element ref="issue"/>
+        <xs:element ref="date"/>
+        <xs:element ref="page-range"/>
+        <xs:element ref="seqno"/>
+        <xs:element ref="title"/>
+        <xs:element ref="authgrp"/>
+        <xs:element ref="keyword"/>
+        <xs:element ref="abstract"/>
+        <xs:element ref="doi"/>
+        <xs:element ref="status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="book-review">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="volume"/>
+        <xs:element ref="issue"/>
+        <xs:element ref="date"/>
+        <xs:element ref="page-range"/>
+        <xs:element ref="seqno"/>
+        <xs:element ref="reviewsectiontitle"/>
+        <xs:element ref="book-info"/>
+        <xs:element ref="reviewer"/>
+        <xs:element ref="doi"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+<xs:element name="books-received">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element ref="volume"/>
+      <xs:element ref="issue"/>
+      <xs:element ref="date"/>
+      <xs:element ref="page-range"/>
+      <xs:element ref="seqno"/>
+      <!-- Special: doesnt inherit from "title" -->
+      <!-- content of "books-received/title" must be a set value -->
+      <xs:element name="title" type="booksReceivedTitle"/>
+      <xs:element ref="doi"/>
+      <xs:element ref="status" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+
+  <!-- definition of simple elements -->
+
+  <xs:element name="volume" type="xs:positiveInteger"/>
+  <xs:element name="issue" type="issueType"/>
+  <xs:element name="fpage" type="xs:positiveInteger"/>
+  <xs:element name="lpage" type="xs:positiveInteger"/>
+  <xs:element name="seqno" type="xs:positiveInteger"/>
+  <xs:element name="date" type="seasonalDate"/>
+  <xs:element name="title" type="italic"/>
+  <xs:element name="ln" type="xs:string"/>
+  <xs:element name="fn" type="xs:string"/>
+  <xs:element name="keyword" type="intermingledItalic"/>
+  <xs:element name="abstract" type="intermingledItalic"/>
+  <xs:element name="doi" type="doiType"/>
+  <xs:element name="italic" type="nonEmptyString"/>
+  <xs:element name="bookauthor" type="authorType"/>
+  <xs:element name="bookeditor" type="authorType"/>
+  <xs:element name="author" type="affiliatedAuthorType"/>
+  <xs:element name="revauth" substitutionGroup="author"/>
+  <xs:element name="pages" type="pagesType"/>
+  <xs:element name="pubdate" type="pulishingYear"/>
+  <xs:element name="series-info" type="xs:string"/>
+  <xs:element name="publisher" type="xs:string"/>
+  <xs:element name="pubplace" type="xs:string"/>
+  <xs:element name="price" type="encodedBookPrice"/>
+  <xs:element name="isbn" type="ISBN10and13Type"/>
+  <xs:element name="reviewsectiontitle" type="italic"/>
+
+  <!-- definition of complex elements -->
+
+  <xs:element name="book-info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="bookauthor"/>
+          <xs:element ref="bookeditor" maxOccurs="unbounded"/>
+        </xs:choice>
+        <xs:sequence>
+          <xs:element ref="booktitle"/>
+          <xs:element ref="series-info"/>
+          <xs:element ref="publisher"/>
+          <xs:element ref="pubplace"/>
+          <xs:element ref="pubdate"/>
+          <xs:element ref="pages"/>
+          <xs:element ref="price"/>
+          <xs:element ref="isbn"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="page-range">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="fpage"/>
+        <xs:element ref="lpage"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="reviewer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="revauth"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="authgrp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="author" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="aff">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="intermingledItalic">
+          <xs:attribute name="affid" use="required" type="affrefType"/>
+          <xs:attribute name="id" use="required" type="xs:string"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="booktitle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="italic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- EMPTY ELEMENTS -->
+
+  <xs:element name="status">
+    <xs:complexType/>
+  </xs:element>
+
+  <!-- CUSTOM TYPES -->
+
+  <xs:complexType name="italic">
+    <xs:sequence>
+      <xs:element ref="italic"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name= "intermingledItalic" mixed="true">
+    <xs:sequence>
+      <xs:element ref="italic" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Type used for authors which lack affiliation -->
+  <xs:complexType name="authorType">
+    <xs:sequence>
+      <xs:element ref="ln"/>
+      <xs:element ref="fn"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Inherits from the authorType that lacks affiliations -->
+  <xs:complexType name="affiliatedAuthorType">
+    <xs:complexContent>
+      <xs:extension base="authorType">
+        <xs:sequence>
+          <xs:element ref="aff"/>
+        </xs:sequence>
+        <xs:attribute name="affref" use="required" type="affrefType"/>
+        <xs:attribute name="id" use="required" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="affrefType">
+    <xs:restriction base="xs:NCName">
+      <xs:pattern value="(a[1-9][0-9]*)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="doiType">
+    <xs:restriction base="xs:string">
+      <!-- XSD regular expressions don't need forward slahses to be escaped -->
+      <xs:pattern value="(10.18647/[1-9][0-9]{0,3}/[jJ]{2}[sS]{1}-[1-2][0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="booksReceivedTitle">
+    <xs:sequence>
+      <xs:element name="italic">
+        <xs:simpleType>
+          <xs:restriction base="nonEmptyString">
+            <xs:enumeration value="Books Received"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="issueType">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="seasonalDate">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(Spring\s[1-2][0-9]{3}|Autumn\s[1-2][0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="pagesType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([1-9][0-9]+|[ivxl]{1,5},\s[1-9][0-9]+)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="pulishingYear">
+    <xs:restriction base="xs:gYear">
+      <xs:minInclusive value="1940"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="encodedBookPrice">
+    <xs:restriction base="xs:string">
+      <!-- \p{Sc} is the shorthand for the character category for currency -->
+      <xs:pattern value="(\p{Sc}[0-9]{1,4}\.[0-9]{2})"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ISBN10and13Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(ISBN\s[\dX]{13}|ISBN\s[\d\-X]{17}|ISBN\s[\dX]{10}|ISBN\s[\d\-X]{13})"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- This type is to forbid validation of empty elements that expect strings.-->
+  <xs:simpleType name="nonEmptyString">
+   <xs:restriction base="xs:string">
+     <xs:minLength value="1"/>
+   </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+example_xml
+Validation_notebook.ipynb
+notes_and_thoughts.txt
