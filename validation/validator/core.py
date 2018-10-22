@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-"""Validator XML main.
+"""Validator XML Core.
 
 Validator of that incorporates XML Schema and Python techniques to ensure JJS
 XML is both well formed, valid and sematicly correct.
@@ -9,12 +9,15 @@ XML is both well formed, valid and sematicly correct.
 Copyright Ian Vermes 2018
 """
 
-from typing import Mapping, MutableMapping, Sequence, Iterable, List, Set
 
-
-def main(directory: str):
-    """Operate over the XML in the directory, validating and reporting them each in turn."""
+def main(str):
+    """Validate the XML in the directory and reporting on each."""
     return
+
+
+def contextual_import_tester():
+    """Part of the test suite & confirms that the module has been imported."""
+    return True
 
 
 if __name__ == '__main__':

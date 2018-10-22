@@ -1,0 +1,4 @@
+[flake8]
+ignore = D102
+exclude = .svn,CVS,.bzr,.hg,.git,__pycache__,.tox,__init__.py
+max-complexity = 10
