@@ -10,8 +10,6 @@ import configparser
 import os
 
 
-
-
 class ConfigData(object):
     """An object orientated version of the settings config file.
 
