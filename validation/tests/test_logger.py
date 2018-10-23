@@ -11,6 +11,7 @@ from .basesuite import ExtendedTestCase
 
 import unittest
 import os
+import queue
 
 
 class TestLoggerObject(ExtendedTestCase):
@@ -39,7 +40,8 @@ class TestLoggerObjectFunctionality(ExtendedTestCase):
         cls.rmrf_log_dir = False
 
     def setUp(self):
-        self.error_stream = [e for e in self.error_stream_contents]
+        self.error_stream = queue.Queue()
+        _ = [self.error_stream.put(e) for e in self.error_stream_contents]
         self.logger = logger.ErrorLogger(self.log_filename, self.error_stream)
 
     def tearDown(self):
@@ -53,12 +55,15 @@ class TestLoggerObjectFunctionality(ExtendedTestCase):
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
 
-    def test_logger_makes_file(self):
+    def test_logger_makes_one_file(self):
+        self.logger.listen()
         self.logger.listen()
 
         has_file = os.path.isfile(self.log_filename)
+        file_count = len(os.listdir(self.log_dir))
 
         self.assertTrue(has_file)
+        self.assertEqual(1, file_count)
 
 
 if __name__ == '__main__':
