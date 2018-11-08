@@ -50,22 +50,22 @@
     </xs:complexType>
   </xs:element>
 
-<xs:element name="books-received">
-  <xs:complexType>
-    <xs:sequence>
-      <xs:element ref="volume"/>
-      <xs:element ref="issue"/>
-      <xs:element ref="date"/>
-      <xs:element ref="page-range"/>
-      <xs:element ref="seqno"/>
-      <!-- Special: doesnt inherit from "title" -->
-      <!-- content of "books-received/title" must be a set value -->
-      <xs:element name="title" type="booksReceivedTitle"/>
-      <xs:element ref="doi"/>
-      <xs:element ref="status" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-</xs:element>
+  <xs:element name="books-received">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="volume"/>
+        <xs:element ref="issue"/>
+        <xs:element ref="date"/>
+        <xs:element ref="page-range"/>
+        <xs:element ref="seqno"/>
+        <!-- Special: doesnt inherit from "title" -->
+        <!-- content of "books-received/title" must be a set value -->
+        <xs:element name="title" type="booksReceivedTitle"/>
+        <xs:element ref="doi"/>
+        <xs:element ref="status" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 
   <!-- definition of simple elements -->
 
