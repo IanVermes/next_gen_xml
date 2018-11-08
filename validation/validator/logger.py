@@ -10,9 +10,12 @@ Copyright Ian Vermes 2018
 """
 
 import datetime
+from functools import wraps
+
 
 class ErrorLogger(object):
     """Digests error stream objects and writes them to a log file.
+
     args:
         filename(str)
         error_stream(queue.Queue)
@@ -21,37 +24,46 @@ class ErrorLogger(object):
     def __init__(self, filename, error_stream):
         self.filename = filename
         self.stream = error_stream
+        self.add_linebreak_packaging = "{}\n"
+
+    def add_linebreak(func):
+        """A decorator to add linebreaks to string returning functions."""
+        @wraps(func)
+        def magic(*args):
+            packaging = "{}\n"
+            return packaging.format(func(*args))
+        return magic
 
     def listen(self):
-        f = self._make_log()
+        """Process the queued exceptions and log them as a headed section."""
+        f = self._touch_file()
+        try:
+            f.write(self._generate_header())
+            for i in range(self.stream.qsize()):
+                error = self.stream.get()
+                error_string = self._process_error(error)
+                f.write(error_string)
+            f.write(self._generate_tail())
+        finally:
+            f.close()
 
-        f.write(self._generate_header())
-        for i in range(self.stream.qsize()):
-            item = self.stream.get()
-            string = self._process_item(item)
-            f.write(string)
-        f.write(self._generate_tail())
-
-        f.close()
-
-    def _make_log(self):
+    def _touch_file(self):
         f = open(self.filename, mode='a+')
         return f
 
-    def _process_item(self, item):
+    @add_linebreak
+    def _process_error(self, item):
         string = str(item)
-        return self._format_string(string)
+        return string
 
-    def _format_string(self, string):
-        packaging = "{}\n"
-        return packaging.format(string)
-
+    @add_linebreak
     def _generate_header(self):
         count = self.stream.qsize()
         timestamp = datetime.datetime.now().ctime()
         header = f"{timestamp}    Errors: {count}"
-        return self._format_string(header)
+        return header
 
+    @add_linebreak
     def _generate_tail(self):
         tail = "* * *"
-        return self._format_string(tail)
+        return tail
