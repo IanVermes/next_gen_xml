@@ -108,4 +108,5 @@ notes_and_thoughts.txt
 
 # Actual project ignores
 validation/tests/logs
+validation/tests/resources/*
 demo
