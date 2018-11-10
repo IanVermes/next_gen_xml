@@ -10,7 +10,6 @@ from tests.basesuite import ExtendedTestCase
 from validator import core
 
 import unittest
-import sys
 import os
 
 
@@ -29,9 +28,11 @@ class TestPrimitive(ExtendedTestCase):
         self.assertTrue(flag)
 
     def test_raising_root_exceptions(self):
+        import validator
+        root_exception = validator.exceptions.NextGenError
         primitive = core._TestingPrimitive()
 
-        with self.assertRaises(core.NextGenError):
+        with self.assertRaises(root_exception):
             primitive.raise_package_error()
 
 class TestGlobals(ExtendedTestCase):
@@ -44,6 +45,7 @@ class TestGlobals(ExtendedTestCase):
 
         self.assertTrue(os.path.isfile(path),
                         msg=f"path:{repr(path)} does not lead to a file.")
+
 
 if __name__ == '__main__':
     unittest.main()

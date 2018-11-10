@@ -9,14 +9,12 @@ XML is both well formed, valid and sematicly correct.
 Copyright Ian Vermes 2018
 """
 
+from validator import exceptions
+
 import os
 
 CORE_SETTINGS_FILENAME = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "CORE_SETTINGS.ini"))
-
-
-class NextGenError(Exception):
-    """Base exception for this package."""
 
 
 class _TestingPrimitive():
@@ -30,7 +28,7 @@ class _TestingPrimitive():
     @classmethod
     def raise_package_error(cls):
         """Confirms that the module has a base exception."""
-        package_base_eror = NextGenError()
+        package_base_eror = exceptions.NextGenError()
         raise package_base_eror
 
 
