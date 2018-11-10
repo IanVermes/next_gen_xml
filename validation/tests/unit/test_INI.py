@@ -6,7 +6,7 @@
 Copyright Ian Vermes 2018
 """
 
-from .basesuite import ExtendedTestCase
+from tests.basesuite import ExtendedTestCase
 from validator.helpers import confighandler
 
 import unittest
@@ -15,8 +15,9 @@ import glob
 import os
 
 INI_PARTIAL_NAME = "CORE_SETTINGS.ini"
+PACKAGE_ROOT = '../..'
 PACKAGE_DIRECTORY = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..'))
+    os.path.join(os.path.dirname(__file__), PACKAGE_ROOT))
 INI_SECTIONS = ('Log File', 'schema', 'xslt', 'Config Object Attributes')
 
 

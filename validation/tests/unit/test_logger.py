@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from validator import logger
-from .basesuite import ExtendedTestCase
+from tests.basesuite import ExtendedTestCase
 
 import unittest
 import os

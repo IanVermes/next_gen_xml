@@ -6,32 +6,33 @@
 Copyright Ian Vermes 2018
 """
 
-from .basesuite import ExtendedTestCase
+from tests.basesuite import ExtendedTestCase
 from validator import core
 
 import unittest
 import sys
 import os
 
-class DummyTestSuite(ExtendedTestCase):
+
+class TestPrimitive(ExtendedTestCase):
     """Basic test cases."""
 
     def test_absolute_truth_and_meaning(self):
         truth = True
         self.assertTrue(truth)
 
-    def test_relative_import_of_contextualised_of_module(self):
-        module_directory = os.path.abspath(
-            os.path.join(os.path.basename(__file__), ".."))
-        path_list = sys.path.copy()
+    def test_import_of_module(self):
+        primitive = core._TestingPrimitive()
 
-        self.assertIn(module_directory, path_list)
+        flag = primitive.verify_import_tester()
 
-    def test_relative_import_of_module_successful(self):
-        import_validator = core.contextual_import_tester
+        self.assertTrue(flag)
 
-        self.assertTrue(import_validator())
+    def test_raising_root_exceptions(self):
+        primitive = core._TestingPrimitive()
 
+        with self.assertRaises(core.NextGenError):
+            primitive.raise_package_error()
 
 class TestGlobals(ExtendedTestCase):
 
