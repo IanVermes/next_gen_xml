@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.basesuite import ExtendedTestCase
-from validator import core
+import validator.core as core
 
 import unittest
 import os
