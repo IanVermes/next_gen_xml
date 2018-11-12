@@ -6,7 +6,6 @@
 Copyright Ian Vermes 2018
 """
 
-
 import argparse
 import os
 
