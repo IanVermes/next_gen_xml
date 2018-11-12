@@ -7,6 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.basesuite import ExtendedTestCase
+from tests.unit.test_argparser import CommandLineTestCase
 from validator import core
 
 import unittest
@@ -28,19 +29,15 @@ class TestUserStories(ExtendedTestCase):
         # User is presented with a log file
 
 
-class Test_CommandLine_Entry(ExtendedTestCase):
+class Integration_CommandLine_Entry(CommandLineTestCase):
 
     @classmethod
-    def setUpClass(cls):
-        cls.dir_valid = os.path.expanduser("~/Desktop")
-        cls.dir_invalid = os.path.expanduser("~/FooBar")
-        assert os.path.isdir(cls.dir_valid)
-        assert not os.path.isdir(cls.dir_invalid)
+    def setUpClass(self):
+        super(Integration_CommandLine_Entry, self).setUpClass()
+        self.entry_point_py = core.__file__
+        assert os.path.isfile(self.entry_point_py)
 
-        cls.entry_point_py = core.__file__
-        assert os.path.isfile(cls.entry_point_py)
-
-        cls.error_text = f"{os.path.basename(cls.entry_point_py)}: error"
+        self.error_text = f"{os.path.basename(self.entry_point_py)}: error"
 
     def test_user_expected_arg(self):
         quote = shlex.quote
