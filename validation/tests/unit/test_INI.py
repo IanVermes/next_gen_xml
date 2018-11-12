@@ -6,7 +6,7 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.basesuite import ExtendedTestCase
+from tests.base_testcases import ExtendedTestCase
 from validator.helpers import confighandler
 
 import unittest

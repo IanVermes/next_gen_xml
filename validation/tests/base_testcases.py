@@ -4,6 +4,7 @@
 """A class that extends unittest.TestCase with additional methods."""
 
 import unittest
+import os
 
 HAS_ATTR_MESSAGE = '{} should have an attribute {}'
 
@@ -17,3 +18,13 @@ class ExtendedTestCase(unittest.TestCase):
                 self.fail(message)
             else:
                 self.fail(HAS_ATTR_MESSAGE.format(obj, attrname))
+
+
+class CommandLineTestCase(ExtendedTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.dir_valid = os.path.expanduser("~/Desktop")
+        cls.dir_invalid = os.path.expanduser("~/FooBar")
+        assert os.path.isdir(cls.dir_valid)
+        assert not os.path.isdir(cls.dir_invalid)

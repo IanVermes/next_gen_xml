@@ -6,14 +6,14 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.basesuite import ExtendedTestCase
-from tests.unit.test_argparser import CommandLineTestCase
+from tests.base_testcases import ExtendedTestCase, CommandLineTestCase
 from validator import core
 
 import unittest
 import os
 import subprocess
 import shlex
+
 
 class TestUserStories(ExtendedTestCase):
 
@@ -75,3 +75,7 @@ class Integration_CommandLine_Entry(CommandLineTestCase):
         # User recieves an error, script exits.
         self.assertNotEqual(status, 0, msg=cmd)
         self.assertIn(self.error_text, stdout.lower())
+
+
+if __name__ == '__main__':
+    unittest.main()

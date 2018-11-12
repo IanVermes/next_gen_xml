@@ -6,20 +6,11 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.basesuite import ExtendedTestCase
+from tests.base_testcases import CommandLineTestCase
 from validator.helpers.argparse import NextGenArgParse
 
 import unittest
 import os
-
-class CommandLineTestCase(ExtendedTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.dir_valid = os.path.expanduser("~/Desktop")
-        cls.dir_invalid = os.path.expanduser("~/FooBar")
-        assert os.path.isdir(cls.dir_valid)
-        assert not os.path.isdir(cls.dir_invalid)
 
 
 class CommandLineArgumentTest(CommandLineTestCase):
@@ -30,3 +21,7 @@ class CommandLineArgumentTest(CommandLineTestCase):
 
     def test(self):
         self.fail("TODO")
+
+
+if __name__ == '__main__':
+    unittest.main()
