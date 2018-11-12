@@ -27,6 +27,10 @@ class CommandLineArgumentTest(CommandLineTestCase):
     def tearDown(self):
         self.stderr_bypass.close()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> e1bfa0e8e992665047525d87709b79778f7e3de0
     def test_parse_valid_dir(self):
         cmd = "{}".format(shlex.quote(self.dir_valid))
         cmd = shlex.split(cmd)
