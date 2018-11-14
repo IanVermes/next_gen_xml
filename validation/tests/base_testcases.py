@@ -28,3 +28,23 @@ class CommandLineTestCase(ExtendedTestCase):
         cls.dir_invalid = os.path.expanduser("~/FooBar")
         assert os.path.isdir(cls.dir_valid)
         assert not os.path.isdir(cls.dir_invalid)
+
+
+class INIandSettingsTestCase(ExtendedTestCase):
+
+    @staticmethod
+    def find_and_get_path(filename, root_dir):
+        path = None
+
+        for root, dirs, files in os.walk(root_dir):
+            for candidate_file in files:
+                if filename == candidate_file:
+                    path = os.path.abspath(os.path.join(root, filename))
+                    break
+
+        if path is not None:
+            return path
+        else:
+            msg = (f"file:'{filename}' was not found despite "
+                   f"walking dir:'{root_dir}.'")
+            raise FileNotFoundError(msg)

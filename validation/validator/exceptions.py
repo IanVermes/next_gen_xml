@@ -12,3 +12,7 @@ Copyright Ian Vermes 2018
 
 class NextGenError(Exception):
     """Base exception for this package."""
+
+
+class FileNotFound(NextGenError):
+    """Could not find a file within the filesystem"""
