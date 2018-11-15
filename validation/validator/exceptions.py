@@ -15,4 +15,20 @@ class NextGenError(Exception):
 
 
 class FileNotFound(NextGenError):
-    """Could not find a file within the filesystem"""
+    """Could not find a file within the filesystem."""
+
+
+class DirNotFound(NextGenError):
+    """Could not find a directory within the filesystem."""
+
+
+class ParentDirNotFound(DirNotFound):
+    """Could not find a parent directory of file in the filesystem."""
+
+
+class UnnaceptableDirName(DirNotFound):
+    """Cannot use empty string '' as local directory name, use './' instead."""
+
+
+class UnexpectedEnum(NextGenError):
+    """Enum is not valid."""
