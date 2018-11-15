@@ -125,6 +125,8 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         cls.inifile = cls.find_and_get_path(
             INI_PARTIAL_NAME, PACKAGE_DIRECTORY)
 
+        cls.expected_attributes = ("log_filename", "mode")
+
     def tearDown(self):
         # Reset the singleton so that singletons created between tests are unique.
         metaclass = settings_handler.Singleton
@@ -151,13 +153,23 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         self.assertIsInstance(class_, metaclass)
 
     def test_has_expected_attributes(self):
-        expected_attributes = set(["log_filename"])
+        attrs = self.expected_attributes
         singleton = settings_handler.Settings(self.inifile)
 
-        for expected in expected_attributes:
-            with self.subTest(attr=expected):
+        for expected in attrs:
+            with self.subTest(attrname=expected):
 
                 self.assertHasAttr(obj=singleton, attrname=expected)
+
+    def test_has_no_unexpected_attributes(self):
+        expected_attrs = set(self.expected_attributes)
+        singleton = settings_handler.Settings(self.inifile)
+        attrs = (a for a in dir(singleton) if not a.startswith("_"))
+
+        for actual in attrs:
+            with self.subTest(unepexcted_attr=actual):
+                msg = f"Suprise: did not expect to find 'singleton.{actual}'"
+                self.assertIn(actual, expected_attrs, msg=msg)
 
     def test_attributes_are_not_settable(self):
         singleton = settings_handler.Settings(self.inifile)
@@ -177,12 +189,102 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         singleton = settings_handler.Settings(self.inifile)
         var = singleton.log_filename
 
+        dest_dir = os.path.dirname(singleton.log_filename)
+        isAbsolute = dest_dir.startswith("/")
+        isExpandedUser = "~" in dest_dir
+
         self.assertIsInstance(var, str)
-        self.assertTrue(os.path.isfile(var))
+        self.assertTrue(os.path.isdir(dest_dir), f"Dir: {dest_dir}")
+        self.assertTrue(isAbsolute, f"Dir: {dest_dir} is not an absolute path.")
+        self.assertFalse(isExpandedUser, f"Dir: {dest_dir} needs userexpansion.")
 
 
+class TestSettingsDataSingleton_Mode_Kwarg(INIandSettingsTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.inifile = cls.find_and_get_path(
+            INI_PARTIAL_NAME, PACKAGE_DIRECTORY)
 
+    def tearDown(self):
+        # Reset the singleton so that singletons created between tests are unique.
+        metaclass = settings_handler.Singleton
+        class_ = settings_handler.Settings
+        try:
+            metaclass.reset_singleton(class_)
+        except KeyError:
+            pass  # A test may not have created a singleton.
+
+    def test_singleton_class_accepts_mode_kwarg(self):
+        live = settings_handler.Mode.LIVE
+        try:
+            settings_handler.Settings(self.inifile, mode=live)
+        except TypeError as err:
+            err_msg = str(err)
+            err_kwarg = "keyword argument"
+            if err_msg in err_kwarg:
+                assertion_msg = "TypeError due to bad keyword argument."
+                self.fail(assertion_msg)
+            else:
+                raise
+        else:
+            pass  # pass test if kwarg is accepted
+
+    def test_singleton_has_mode_attr(self):
+        live = settings_handler.Mode.LIVE
+        expected_attr = "mode"
+
+        singleton = settings_handler.Settings(self.inifile, mode=live)
+
+        self.assertHasAttr(obj=singleton, attrname=expected_attr)
+
+    def test_singleton_mode_attr_is_enum(self):
+        import enum
+        live = settings_handler.Mode.LIVE
+
+        singleton = settings_handler.Settings(self.inifile, mode=live)
+
+        self.assertIsInstance(singleton.mode, enum.Enum)
+        self.assertIsInstance(singleton.mode, settings_handler.Mode)
+
+    def test_singleton_mode_defaults_to_live(self):
+        Mode = settings_handler.Mode
+        expected_mode = Mode.LIVE
+        wrong_modes = [m for m in list(Mode) if m is not expected_mode]
+
+        singleton = settings_handler.Settings(self.inifile)
+
+        self.assertIs(singleton.mode, expected_mode)
+        self.assertEqual(singleton.mode, expected_mode)
+        for some_mode in wrong_modes:
+            with self.subTest(wrong_mode=some_mode):
+                self.assertIsNot(singleton.mode, some_mode)
+                self.assertNotEqual(singleton.mode, some_mode)
+
+    def test_singleton_contextually_presents_different_values(self):
+        Mode = settings_handler.Mode
+        modes = list(Mode)
+        metaclass = settings_handler.Singleton
+
+        results = []
+        for some_mode in modes:
+                try:
+                    instantiated = False
+                    singleton = settings_handler.Settings(self.inifile, mode=some_mode)
+                except Exception as e:
+                    raise
+                else:
+                    instantiated = True
+                    contextual_value = singleton.log_filename
+                    results.append(contextual_value)
+                finally:
+                    # cleanup and reset singeton
+                    if instantiated:
+                        metaclass.reset_singleton(type(singleton))
+
+        msg = "The values of the attribute did not vary with context."
+        set_length = len(set(results))
+        self.assertEqual(set_length, len(results), msg=msg)
 
 
 if __name__ == '__main__':

@@ -7,11 +7,20 @@ Copyright Ian Vermes 2018
 """
 
 from validator import exceptions
+from validator.helpers import path
 
 import configparser
+import enum
 import os
 
 
+class Mode(enum.Enum):
+    LIVE = 1
+    TEST = 2
+
+    @classmethod
+    def get_default(cls):
+        return cls.LIVE
 
 
 class Singleton(type):
@@ -46,15 +55,14 @@ class Singleton(type):
             raise TypeError(errmsg)
 
 
-
 class Settings(metaclass=Singleton):
-    """An object orientated version of the settings config file.
+    """An object orientated singleton of the settings config file.
 
     Args:
         config_filename(str): Path to .INI file.
 
     Methods:
-        log_filename: Generate a path for where the log file is expected to be.
+        log_filename: Get the path for where the log file is expected to be.
     """
 
     @staticmethod
@@ -66,20 +74,52 @@ class Settings(metaclass=Singleton):
         config.read(filename)
         return config
 
-    def __init__(self, config_filename):
-        """Initialise, dependent on being able to read a config file."""
-        self._config = self._get_config(config_filename)
-        self.__log_filename = ""
+    def __init__(self, config_filename, mode=None):
+        """Initialise, dependent on being able to read a config file.
 
+        Args:
+            config_filename(str): Path to config.ini file of package.
+        Kwargs:
+            mode(Mode): By default use the Mode.default(),
+                        otherwise Mode.LIVE or Mode.TEST.
+        Exceptions:
 
-    # [DEFAULT] RELATED METHODS
+        """
+        # Dependecy attributes
+        self.__mode = self._get_enumareted_mode(mode)
+        self.__config = self._get_config(config_filename)
+        # Calculated attributes
+        self.__log_filename = self._attr_get_log_filename()
 
-    # [Log File] RELATED METHODS
+    def _get_value_from_config(self, option):
+        value = self.__config.get(str(self.mode), option)
+        return value
+
+    # mode
+    @property
+    def mode(self):
+        return self.__mode
+
+    def _get_enumareted_mode(self, mode):
+        if mode is None:
+            mode = Mode.get_default()
+
+        if not isinstance(mode, Mode):
+            msg = "Use enums from the Mode class."
+            raise TypeError(msg)
+        else:
+            if mode is Mode.LIVE or mode is Mode.TEST:
+                return mode
+            else:
+                raise exceptions.UnexpectedEnum(mode)
+
+    # log_filename
     @property
     def log_filename(self):
         return self.__log_filename
 
-
-    # [xslt] RELATED METHODS
-
-    # [schema] RELATED METHODS
+    def _attr_get_log_filename(self):
+        option = "log_filename"
+        filename = self._get_value_from_config(option)
+        filename = path.expandpath(filename, exists=False, dir_exists=True)
+        return filename
