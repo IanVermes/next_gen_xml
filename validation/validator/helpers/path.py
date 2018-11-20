@@ -6,7 +6,7 @@
 Copyright Ian Vermes 2018
 """
 
-from validator import exceptions
+import exceptions
 
 import os
 import enum

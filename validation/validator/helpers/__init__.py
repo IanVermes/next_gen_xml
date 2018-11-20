@@ -1,7 +1,3 @@
-try:
-    from helpers import argparse
-except ModuleNotFoundError:
-    try:
-        from validator.helpers import argparse
-    except ModuleNotFoundError:
-        raise
+import helpers.argparse
+import helpers.settings_handler
+import helpers.path

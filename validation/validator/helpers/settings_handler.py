@@ -6,8 +6,8 @@
 Copyright Ian Vermes 2018
 """
 
-from validator import exceptions
-from validator.helpers import path
+import exceptions
+import helpers.path as path
 
 import configparser
 import enum
@@ -60,9 +60,13 @@ class Settings(metaclass=Singleton):
 
     Args:
         config_filename(str): Path to .INI file.
+    Kwargs:
+        mode(Mode): By default use the Mode.default(),
+                    otherwise Mode.LIVE or Mode.TEST.
 
-    Methods:
-        log_filename: Get the path for where the log file is expected to be.
+    Attributes:
+        log_filename: The path for where the log file is expected to be written.
+        mode: Mode.LIVE or Mode.TEST, used internally and for external operations.
     """
 
     @staticmethod
