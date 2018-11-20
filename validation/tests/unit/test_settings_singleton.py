@@ -7,8 +7,8 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import INIandSettingsTestCase, ExtendedTestCase
-from validator.helpers import settings_handler
-from validator import exceptions
+from helpers import settings_handler
+import exceptions  # from validator import exceptions
 
 import unittest
 import os

@@ -7,8 +7,8 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import ExtendedTestCase
-from validator.helpers import path as under_consideration  # <- avoid confusion with os.path
-from validator import exceptions
+from helpers import path as under_consideration  # <- avoid confusion with os.path
+import exceptions  # from validator import exceptions
 
 from collections import namedtuple
 import unittest
@@ -139,10 +139,6 @@ class TestExpandPath(ExtendedTestCase):
 
     def test_expand_path_raises_exceptions_do_not_validate_existence(self):
         kwargs = {"criteria_attr": "name", "exists": False, "dir_exists": False}
-
-
-
-
 
 
 if __name__ == '__main__':

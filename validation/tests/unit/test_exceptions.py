@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import ExtendedTestCase
-from validator import exceptions
+import exceptions  # from validator import exceptions
 
 import unittest
 

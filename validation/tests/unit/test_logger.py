@@ -6,8 +6,8 @@
 Copyright Ian Vermes 2018
 """
 
-from validator import logger
 from tests.base_testcases import ExtendedTestCase
+import logger  # from validator import logger
 
 import unittest
 import os
