@@ -60,10 +60,10 @@ class TestLoggerObjectFunctionality(ExtendedTestCase):
         self.logger.listen()
 
         has_file = os.path.isfile(self.log_filename)
-        file_count = len(os.listdir(self.log_dir))
+        file_count = len([f for f in os.listdir(self.log_dir) if not f.startswith(".")])  # Ignore 'invisible' files.
 
         self.assertTrue(has_file)
-        self.assertEqual(1, file_count)
+        self.assertEqual(1, file_count, msg=f"Files: {os.listdir(self.log_dir)}")
 
 
 if __name__ == '__main__':
