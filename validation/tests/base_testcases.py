@@ -3,6 +3,8 @@
 
 """A class that extends unittest.TestCase with additional methods."""
 
+import tests.context
+
 import unittest
 import os
 

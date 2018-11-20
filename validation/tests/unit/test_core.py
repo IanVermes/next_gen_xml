@@ -5,9 +5,9 @@
 
 Copyright Ian Vermes 2018
 """
-
 from tests.base_testcases import ExtendedTestCase
-import validator.core as core
+import core
+import exceptions
 
 import unittest
 import os
@@ -29,7 +29,7 @@ class TestPrimitive(ExtendedTestCase):
 
     def test_raising_root_exceptions(self):
         import validator
-        root_exception = validator.exceptions.NextGenError
+        root_exception = exceptions.NextGenError
         primitive = core._TestingPrimitive()
 
         with self.assertRaises(root_exception):

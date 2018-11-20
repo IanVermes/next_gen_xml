@@ -9,23 +9,8 @@ XML is both well formed, valid and sematicly correct.
 Copyright Ian Vermes 2018
 """
 
-try:
-    import exceptions
-except ModuleNotFoundError:
-    # Necessary if calling: $ python -m unittest
-    try:
-        from validator import exceptions
-    except ModuleNotFoundError:
-        raise
-
-try:
-    import helpers
-except ModuleNotFoundError:
-    try:
-        from validator import helpers
-    except ModuleNotFoundError:
-        raise
-
+import exceptions
+import helpers
 
 import os
 
