@@ -24,10 +24,14 @@ class CommandLineTestCase(ExtendedTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.dir_valid = os.path.expanduser("~/Desktop")
-        cls.dir_invalid = os.path.expanduser("~/FooBar")
+        expanduser = os.path.expanduser
+        abspath = os.path.abspath
+        cls.dir_valid = abspath(expanduser("~/Desktop"))
+        cls.dir_invalid = abspath(expanduser("~/FooBar"))
+        cls.file_valid = abspath(expanduser("tests/resources/valid_document.xml"))
         assert os.path.isdir(cls.dir_valid)
         assert not os.path.isdir(cls.dir_invalid)
+        assert os.path.isfile(cls.file_valid)
 
 
 class INIandSettingsTestCase(ExtendedTestCase):
