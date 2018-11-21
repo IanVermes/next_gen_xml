@@ -71,6 +71,15 @@ class XMLValidationTestCase(ExtendedTestCase):
         criteria = f"{valid} {invalid} syntax document rules".split()
         FileProperties = namedtuple("FileProperties", criteria)
 
+        # Strings
+        cls.asserttype = {True: "TruePositive", False: "TrueNegative"}
+        cls.falsepositive_msg = ("{expect} expected from {file}, got "
+                                 "FalsePositive instead.")
+        cls.falsenegative_msg = ("{expect} expected from {file}, got "
+                                 "FalseNegative instead which raised this "
+                                 "unexpected exception: {exc}")
+        cls.detail_msg = ("\nproperty.{attr}: {expect}, resValid: {actual}")
+
         resources = "tests/resources"
         resources = os.path.abspath(resources)
         assert os.path.isdir(resources), f"Could not find {resources}"
@@ -89,5 +98,167 @@ class XMLValidationTestCase(ExtendedTestCase):
                 assessment[substring] = substring in name
             yield fullname, assessment
 
+    def assertNoFalsePositivesOrNegatives(self, values, criterion, validator,
+                                          permitted_exceptions,
+                                          propogate=False):
+        """Tests if known values are pass through validation fucntions correctly.
 
-    # FalsePositive/FalseNegative method that takes files, criterion, validator and exceptions.
+        Args:
+            values(dict): Keys  : filenames
+                          Values: FileProperties namedtuple
+            criterion(string): An attribute of a FileProperties object.
+            validator(func): A boolean function that operates on a filename.
+            permitted_exceptions(Exception/Exceptions)
+        Kwargs:
+            propogate(bool): If True raise AssertionError exceptions, otherwise
+                let the testrunner handle things.
+        Exceptions:
+            FalseNegative
+            FalsePositive
+        """
+
+        # Setup
+        filtered = {}
+        for file, properties in values.items():
+            filtered[file] = getattr(properties, criterion)
+
+        try:
+            permitted_exceptions = tuple(permitted_exceptions)
+        except TypeError:
+            permitted_exceptions = (permitted_exceptions, )
+
+
+
+        # Perform validation operation and collect results
+        for file, expectValid in filtered.items():
+            try:
+                resValid = validator(file)  # Two Outcomes: bool + exc
+            except Exception as exc:
+                resValid = False  # Auto-false.
+                resExc = exc
+            else:
+                resExc = None
+
+            shortname = os.path.basename(file)
+            args = (resValid, expectValid, criterion, propogate, shortname)
+            kwargs = {"result": resValid,
+                      "expected": expectValid,
+                      "exception": resExc,
+                      "expected_exceptions": permitted_exceptions}
+            if propogate is False:
+                with self.subTest(filename=shortname, property=criterion):
+                    self._falsePositiveNegative_logic(*args, **kwargs)
+            else:
+                self._falsePositiveNegative_logic(*args, **kwargs)
+
+
+
+    def _falsePositiveNegative_logic(self, resValid, expectValid, criterion,
+                                     propogate, shortname, **kwargs):
+        # Draw assertions from results
+        try:
+            if resValid is True:
+                self.raisesIfNotTruePositive(**kwargs)
+            elif resValid is False:
+                self.raisesIfNotTrueNegative(**kwargs)
+        except FalsePositive:
+            if propogate is True:
+                raise
+            msg = self.falsepositive_msg
+            msg = msg.format(expect=self.asserttype[resValid],
+                             file=shortname)
+        except FalseNegative as exc:
+            if propogate is True:
+                raise
+            msg = self.falsenegative_msg
+            msg = msg.format(expect=self.asserttype[resValid],
+                             file=shortname,
+                             exc=repr(exc.__cause__))
+        else:
+            msg = ""  # TruePositive and TrueNegative pass the test
+
+        if msg and propogate is False:
+            detail = self.detail_msg
+            detail = detail.format(attr=criterion,
+                                   expect=expectValid,
+                                   actual=resValid)
+            self.fail(msg + detail)
+
+
+    def raisesIfNotTruePositive(self, result, expected, exception, expected_exceptions=None):
+        """Raise exceptions unless result is expected & that exception is None.
+
+        Precondition:
+            result is True
+        Args:
+            result(bool)
+            expected(bool)
+            exception(NoneType, Exception)
+        Kwargs
+            expected_exceptions(Exception or tuple of Exceptions)
+
+        Exceptions:
+            FalseNegative
+            FalsePositive
+        """
+        # Guard block: result == True when we call this.
+        if result is not True:  # i.e. result is not a positive of some sort.
+            msg = ("This function applies logic to positives only, result arg "
+                   "is negative.")
+            raise ValueError(msg)
+        # Check block
+        if result == expected:
+            if exception is None:
+                return  # TruePositive
+            elif expected_exceptions and isinstance(exception, expected_exceptions):
+                raise FalseNegative() from exception  # FalseNegative despite result == expected
+            elif isinstance(exception, Exception):
+                raise FalseNegative() from exception  # FalseNegative despite result == expected
+            else:
+                msg = ("Expected NoneType or Exception, got exception: "
+                       f"{repr(exception)}")
+                raise TypeError(msg)
+        else:
+            raise FalsePositive()  # FalsePositive
+
+    def raisesIfNotTrueNegative(self, result, expected, exception, expected_exceptions):
+        """Raise exceptions unless result is different to expected or exceptions cant be handled
+
+        Precondition:
+            result is False
+        Args:
+            result(bool)
+            expected(bool)
+            exception(NoneType, Exception)
+            expected_exceptions(Exception or tuple of Exceptions)
+
+        Exceptions:
+            FalseNegative
+        """
+        # Guard block: result == False when we call this.
+        if result is True:  # i.e. result is not a negative of some sort.
+            msg = ("This function applies logic to negatives only, result arg "
+                   "is positive.")
+            raise ValueError(msg)
+        # Check block
+        if result == expected:
+            if exception is None:
+                return  # TrueNegative
+            elif isinstance(exception, expected_exceptions):
+                return  # TrueNegative
+            elif isinstance(exception, Exception):
+                raise FalseNegative() from exception  # FalseNegative despite result == expected
+            else:
+                msg = ("Expected NoneType or Exception, got exception: "
+                       f"{repr(exception)}")
+                raise TypeError(msg)
+        else:
+            raise FalseNegative()  # FalseNegative
+
+
+class FalsePositive(AssertionError):
+    """Raise when the expectation and result match yet they should not."""
+
+
+class FalseNegative(AssertionError):
+    """Raise when the expectation and result do not match yet they should."""
