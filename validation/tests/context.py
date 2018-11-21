@@ -27,15 +27,32 @@ or
 import sys
 import os
 
-TARGET_DIR = '../validator/'  # Relative to this file.
-package_dir = os.path.join(os.path.dirname(__file__), TARGET_DIR)
-if not os.path.isdir(package_dir):
-    msg = f"Cannot perform tests, test suite cannot find '{package_dir}'"
-    raise NotADirectoryError(msg)
+PACKAGE_DIR = '../validator/'  # Relative to this file.
 
-sys.path.insert(0, os.path.abspath(package_dir))
+
+def add_packagedir_to_syspath(relative_dir):
+    """Insert relative dir to sys.path, to facilitate import of pkg modules."""
+    pythonpaths = sys.path
+    package_dir = os.path.join(os.path.dirname(__file__), relative_dir)
+    if not os.path.isdir(package_dir):
+        msg = f"Cannot perform tests, test suite cannot find '{package_dir}'"
+        raise NotADirectoryError(msg)
+    if package_dir in pythonpaths:
+        return
+    else:
+        # Do not reinsert if called more than once.
+        sys.path.insert(0, os.path.abspath(package_dir))
+        return
+
+
+def main():
+    """While testing, allow imports from another top level directory/package."""
+    package_dir = PACKAGE_DIR
+    add_packagedir_to_syspath(package_dir)
+
 
 if __name__ == '__main__':
+    main()
 
     modulename = 'core'
     import core

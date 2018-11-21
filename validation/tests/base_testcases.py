@@ -8,6 +8,9 @@ import tests.context
 import unittest
 import os
 
+# To allow consistent imports of pkg modules
+tests.context.main()
+
 HAS_ATTR_MESSAGE = '{} should have an attribute {}'
 
 
