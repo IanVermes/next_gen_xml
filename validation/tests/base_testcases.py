@@ -5,8 +5,11 @@
 
 import tests.context
 
+from collections import namedtuple
+
 import unittest
 import os
+import glob
 
 # To allow consistent imports of pkg modules
 tests.context.main()
@@ -33,7 +36,7 @@ class CommandLineTestCase(ExtendedTestCase):
         abspath = os.path.abspath
         cls.dir_valid = abspath(expanduser("~/Desktop"))
         cls.dir_invalid = abspath(expanduser("~/FooBar"))
-        cls.file_valid = abspath(expanduser("tests/resources/valid_document.xml"))
+        cls.file_valid = abspath(expanduser("tests/resources/valid.xml"))
         assert os.path.isdir(cls.dir_valid)
         assert not os.path.isdir(cls.dir_invalid)
         assert os.path.isfile(cls.file_valid)
@@ -57,3 +60,34 @@ class INIandSettingsTestCase(ExtendedTestCase):
             msg = (f"file:'{filename}' was not found despite "
                    f"walking dir:'{root_dir}.'")
             raise FileNotFoundError(msg)
+
+
+class XMLValidationTestCase(ExtendedTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.invalid_attr = invalid = "illegal"
+        cls.valid_attr = valid = "valid"
+        criteria = f"{valid} {invalid} syntax document rules".split()
+        FileProperties = namedtuple("FileProperties", criteria)
+
+        resources = "tests/resources"
+        resources = os.path.abspath(resources)
+        assert os.path.isdir(resources), f"Could not find {resources}"
+        files = glob.iglob(os.path.join(resources, "*.xml"))
+        iter_assessment = cls.assess_filenames(files, criteria)
+        cls.files = {f: FileProperties(**d) for f, d in iter_assessment}
+
+    @staticmethod
+    def assess_filenames(files, criteria):
+        # criteria = set([c.lower() for c in criteria])
+
+        for fullname in files:
+            assessment = dict()
+            name = os.path.basename(fullname).lower()
+            for substring in criteria:
+                assessment[substring] = substring in name
+            yield fullname, assessment
+
+
+    # FalsePositive/FalseNegative method that takes files, criterion, validator and exceptions.
