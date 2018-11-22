@@ -84,19 +84,52 @@ class XMLValidationTestCase(ExtendedTestCase):
         resources = os.path.abspath(resources)
         assert os.path.isdir(resources), f"Could not find {resources}"
         files = glob.iglob(os.path.join(resources, "*.xml"))
-        iter_assessment = cls.assess_filenames(files, criteria)
+        iter_assessment = cls.assess_resources(files, criteria)
         cls.files = {f: FileProperties(**d) for f, d in iter_assessment}
 
     @staticmethod
-    def assess_filenames(files, criteria):
-        # criteria = set([c.lower() for c in criteria])
+    def assess_resources(files, criteria):
+        """Identify the presence or absence of keywords in resource filenames.
 
+        Depending on substrings in criteria, check if substring in filename.
+        e.g. check if 'illegal' and 'document' in illegal_document_bad_isbn.xml
+
+        Yields:
+            str, dict
+        """
         for fullname in files:
             assessment = dict()
             name = os.path.basename(fullname).lower()
             for substring in criteria:
                 assessment[substring] = substring in name
             yield fullname, assessment
+
+    def get_files_by_criterion(self, criterion):
+        """Get all resources & properties that have properties.<criterion>==True.
+
+        Yields:
+            tuple(str, FileProperties)
+        """
+        resources_iter = self.get_resources_by_criterion(criterion)
+        for filename in resources_iter:
+            yield filename, self.files[filename]
+
+    def get_resources_by_criterion(self, criterion):
+        """Get all filenames/resources that have properties.<criterion>==True.
+
+        Yields:
+            str
+        """
+        for filename, properties in self.files.items():
+            flag = getattr(properties, criterion, default=None)
+            if flag is None:
+                msg = f"namedtuple '{properties}' has no attribute {criterion}."
+                raise AttributeError(msg)
+            if not flag:
+                continue
+            else:
+                yield filename
+
 
     def assertNoFalsePositivesOrNegatives(self, values, criterion, validator,
                                           permitted_exceptions,
@@ -126,8 +159,6 @@ class XMLValidationTestCase(ExtendedTestCase):
             permitted_exceptions = tuple(permitted_exceptions)
         except TypeError:
             permitted_exceptions = (permitted_exceptions, )
-
-
 
         # Perform validation operation and collect results
         for file, expectValid in filtered.items():
