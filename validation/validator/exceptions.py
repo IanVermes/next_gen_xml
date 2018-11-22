@@ -32,3 +32,19 @@ class UnnaceptableDirName(DirNotFound):
 
 class UnexpectedEnum(NextGenError):
     """Enum is not valid."""
+
+
+class ValidationError(NextGenError):
+    """Base exception for XML validation."""
+
+
+class SyntaxValidationError(ValidationError):
+    """Validation error raised due to XML syntax errors."""
+
+
+class SchemaValidationError(ValidationError):
+    """Validation error raised due to XML failing against a Schema."""
+
+
+class RuleValidationError(ValidationError):
+    """Validation error raised due to XML failing bespoke Python rules."""
