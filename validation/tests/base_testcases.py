@@ -104,24 +104,26 @@ class XMLValidationTestCase(ExtendedTestCase):
                 assessment[substring] = substring in name
             yield fullname, assessment
 
-    def get_files_by_criterion(self, criterion):
+    @classmethod
+    def get_files_by_criterion(cls, criterion):
         """Get all resources & properties that have properties.<criterion>==True.
 
         Yields:
             tuple(str, FileProperties)
         """
-        resources_iter = self.get_resources_by_criterion(criterion)
+        resources_iter = cls.get_resources_by_criterion(criterion)
         for filename in resources_iter:
-            yield filename, self.files[filename]
+            yield filename, cls.files[filename]
 
-    def get_resources_by_criterion(self, criterion):
+    @classmethod
+    def get_resources_by_criterion(cls, criterion):
         """Get all filenames/resources that have properties.<criterion>==True.
 
         Yields:
             str
         """
-        for filename, properties in self.files.items():
-            flag = getattr(properties, criterion, default=None)
+        for filename, properties in cls.files.items():
+            flag = getattr(properties, criterion, None)
             if flag is None:
                 msg = f"namedtuple '{properties}' has no attribute {criterion}."
                 raise AttributeError(msg)
