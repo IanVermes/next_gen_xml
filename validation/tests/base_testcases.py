@@ -172,6 +172,22 @@ class XMLValidationTestCase(ExtendedTestCase):
             else:
                 resExc = None
 
+            # The resValid method should be boolean-like for this test
+            # as ducktesting approach is not sufficient. X is True or False
+            # leaves no ambiguity
+            try:
+                if not isinstance(resValid, bool):
+                    raise TypeError()
+            except TypeError as exc:
+                if hasattr(resValid, "__bool__"):
+                    resValid = bool(resValid)
+                    resExc = None
+                else:
+                    msg = ("Validator return object is neither a boolean nor "
+                           "has a __bool__ method, preventing False "
+                           f"Positive/Negative evaluation: {type(resValid)}")
+                    raise ValueError(msg) from exc
+
             shortname = os.path.basename(file)
             args = (resValid, expectValid, criterion, propogate, shortname)
             kwargs = {"result": resValid,
@@ -183,8 +199,6 @@ class XMLValidationTestCase(ExtendedTestCase):
                     self._falsePositiveNegative_logic(*args, **kwargs)
             else:
                 self._falsePositiveNegative_logic(*args, **kwargs)
-
-
 
     def _falsePositiveNegative_logic(self, resValid, expectValid, criterion,
                                      propogate, shortname, **kwargs):

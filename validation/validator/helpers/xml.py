@@ -132,4 +132,6 @@ class ValidationResult(object):
 
 
 def validate_syntax(filename):
-    return bool(filename)
+    exception = None
+    result = ValidationResult(filename, exception)
+    return result
