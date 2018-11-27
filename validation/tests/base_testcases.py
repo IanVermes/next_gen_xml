@@ -152,10 +152,25 @@ class XMLValidationTestCase(ExtendedTestCase):
             FalsePositive
         """
 
-        # Setup
+        # Setup:
+        #   A file is explicitly valid or illegal, but a criterion
+        #   may determine if a file is valid for that criterion in particular
+        #      E.g. illegal_syntax.xml is illegal BUT valid in terms
+        #      of schema YET illegal in terms of syntax
         filtered = {}
         for file, properties in values.items():
-            filtered[file] = getattr(properties, criterion)
+            if criterion in (self.valid_attr, self.invalid_attr):
+                # Get absolute, explicit validity
+                validity = getattr(properties, criterion)
+            else:
+                # Get implicit, criterion-focused validity
+                has_criterion = getattr(properties, criterion)
+                assert isinstance(has_criterion, bool)
+                if has_criterion:
+                    validity = False
+                else:
+                    validity = True
+            filtered[file] = validity
 
         try:
             permitted_exceptions = tuple(permitted_exceptions)
