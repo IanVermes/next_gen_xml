@@ -105,7 +105,9 @@ class ValidationResult(object):
         if suitable:
             return
         else:
-            msg = f"Accepts NoneType or ValidationError instances, got {exc}."
+            name = self.__class__.__name__
+            exc = repr(exc)
+            msg = f"{name} accepts NoneType or ValidationError instances, got {exc}."
             raise TypeError(msg)
 
     @property
