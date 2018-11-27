@@ -227,13 +227,13 @@ class XMLValidationTestCase(ExtendedTestCase):
             if propogate is True:
                 raise
             msg = self.falsepositive_msg
-            msg = msg.format(expect=self.asserttype[resValid],
+            msg = msg.format(expect=self.asserttype[expectValid],
                              file=shortname)
         except FalseNegative as exc:
             if propogate is True:
                 raise
             msg = self.falsenegative_msg
-            msg = msg.format(expect=self.asserttype[resValid],
+            msg = msg.format(expect=self.asserttype[expectValid],
                              file=shortname,
                              exc=repr(exc.__cause__))
         else:
