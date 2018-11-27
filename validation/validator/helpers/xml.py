@@ -7,6 +7,7 @@ Copyright Ian Vermes 2018
 
 import exceptions
 
+import os
 import enum
 
 class OrderedEnum(enum.Enum):
@@ -129,6 +130,16 @@ class ValidationResult(object):
     def passed_rules(self):
         flag = self._this_enum > Passing.RULES
         return flag
+
+    def __repr__(self):
+        address = hex(id(self))
+        name = self.__class__.__name__
+        detail = f"file: .../{os.path.basename(self.filename)}, exc: {repr(self.exception)}"
+        string = f"<{name} object at {address} {detail}>"
+        return string
+
+    def __str__(self):
+        return str(repr(self))
 
 
 def validate_syntax(filename):
