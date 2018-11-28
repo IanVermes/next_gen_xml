@@ -10,6 +10,8 @@ from tests.base_testcases import XMLValidationTestCase
 from helpers.xml import validate_syntax, ValidationResult
 import exceptions
 
+from lxml import etree
+
 import os
 import unittest
 import functools
@@ -20,7 +22,7 @@ class TestSyntaxValidation(XMLValidationTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.base_exc = exceptions.NextGenError
+        cls.base_exc = exceptions.SyntaxValidationError
         cls.valid_file = next(cls.get_resources_by_criterion("valid"))
         cls.illegal_file = next(cls.get_resources_by_criterion("syntax"))
         cls.result_type = ValidationResult
@@ -30,10 +32,6 @@ class TestSyntaxValidation(XMLValidationTestCase):
         return _func(*args)
 
     validator = functools.partialmethod(_validator, _func=validate_syntax)
-
-    @unittest.expectedFailure
-    def test_fail(self):
-        self.fail("Not written.")
 
     def test_validation_passes_with_valid_file(self):
         filename = self.valid_file
@@ -49,6 +47,18 @@ class TestSyntaxValidation(XMLValidationTestCase):
 
         self.assertFalse(result)
 
+    def test_failed_validation_result_has_correct_exception(self):
+        filename = self.illegal_file
+        expected_pkg_exc = self.base_exc
+        expected_cause_exc = etree.XMLSyntaxError
+
+        result = self.validator(filename)
+
+        with self.assertRaises(expected_pkg_exc):
+            raise result.exception
+        with self.assertRaises(expected_cause_exc):
+            raise result.exception.__cause__
+
     def test_validation_returns_result_obj(self):
         filename = self.illegal_file
 
@@ -56,13 +66,13 @@ class TestSyntaxValidation(XMLValidationTestCase):
 
         self.assertIsInstance(result, self.result_type)
 
-    @unittest.expectedFailure
     def test_nofalses_after_syntax_validation(self):
 
         kwargs = {"values": self.files,
                   "criterion": "syntax",
                   "validator": self.validator,
-                  "permitted_exceptions": self.base_exc}
+                  "permitted_exceptions": self.base_exc,
+                  "propogate": False}
         self.assertNoFalsePositivesOrNegatives(**kwargs)
 
 if __name__ == '__main__':
