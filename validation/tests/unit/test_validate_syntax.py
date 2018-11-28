@@ -75,5 +75,17 @@ class TestSyntaxValidation(XMLValidationTestCase):
                   "propogate": False}
         self.assertNoFalsePositivesOrNegatives(**kwargs)
 
+    def test_other_illegal_files_pass(self):
+        """Similar to test_nofalses_after_syntax_validation but explict."""
+        for filename, properties in self.files.items():
+            is_illegal = getattr(properties, self.invalid_attr)
+            has_syntax_err = getattr(properties, "syntax")
+
+            if is_illegal and not has_syntax_err:
+                with self.subTest(name=os.path.basename(filename)):
+                    result = self.validator(filename)
+
+                    self.assertTrue(result)
+
 if __name__ == '__main__':
     unittest.main()

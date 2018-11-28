@@ -7,6 +7,8 @@ Copyright Ian Vermes 2018
 
 import exceptions
 
+from lxml import etree
+
 import os
 import enum
 
@@ -145,6 +147,14 @@ class ValidationResult(object):
 
 
 def validate_syntax(filename):
-    exception = None
+    try:
+        try:
+            etree.parse(filename)
+        except etree.XMLSyntaxError as cause:
+            raise exceptions.SyntaxValidationError() from cause
+    except exceptions.SyntaxValidationError as exc:
+        exception = exc
+    else:
+        exception = None
     result = ValidationResult(filename, exception)
     return result
