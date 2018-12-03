@@ -112,9 +112,9 @@ class Test_XMLValidationTestCase_Itself(XMLValidationTestCase):
             else:
                 counter_pass += 1
 
-        self.assertEqual(counter_pass, 1)
+        self.assertEqual(counter_pass, 3)
         self.assertEqual(counter_FN, 0)
-        self.assertEqual(counter_FP, 5)
+        self.assertEqual(counter_FP, 43)
 
     def test_falsePosNegAssertionFunc_catch_falseNeg(self):
         values = self.files
@@ -147,45 +147,44 @@ class Test_XMLValidationTestCase_Itself(XMLValidationTestCase):
             else:
                 counter_pass += 1
 
-        self.assertEqual(counter_pass, 5)
-        self.assertEqual(counter_FN, 1)
+        self.assertEqual(counter_pass, 43)
+        self.assertEqual(counter_FN, 3)
         self.assertEqual(counter_FP, 0)
 
+    def test_falsePosNegAssertionFunc_permit_known_exc(self):
+        values = self.files
+        criterion = self.invalid_attr
 
-def test_falsePosNegAssertionFunc_permit_known_exc(self):
-    values = self.files
-    criterion = self.invalid_attr
+        def blackbox_introduce_falsenegatives(filename):
+            "Falsenegative forgiven due to permitted error"
+            filename = os.path.basename(filename)
+            flag = criterion.lower() in filename.lower()
+            if "valid" in filename:
+                raise exceptions.NextGenError("Test Foo")
+            return flag
 
-    def blackbox_introduce_falsenegatives(filename):
-        "Falsenegative forgiven due to permitted error"
-        filename = os.path.basename(filename)
-        flag = criterion.lower() in filename.lower()
-        if "valid" in filename:
-            raise exceptions.NextGenError("Test Foo")
-        return flag
+        kwargs = {"criterion": criterion,
+                  "validator": blackbox_introduce_falsenegatives,
+                  "permitted_exceptions": exceptions.NextGenError}
 
-    kwargs = {"criterion": criterion,
-              "validator": blackbox_introduce_falsenegatives,
-              "permitted_exceptions": exceptions.NextGenError}
+        counter_FN = 0
+        counter_FP = 0
+        counter_pass = 0
+        for k, v in values.items():
+            val = {k: v}
 
-    counter_FN = 0
-    counter_FP = 0
-    counter_pass = 0
-    for k, v in values.items():
-        val = {k: v}
+            try:
+                self.assertNoFalsePositivesOrNegatives(val, propogate=True, **kwargs)
+            except FalseNegative:
+                counter_FN += 1
+            except FalsePositive:
+                counter_FP += 1
+            else:
+                counter_pass += 1
 
-        try:
-            self.assertNoFalsePositivesOrNegatives(val, propogate=True, **kwargs)
-        except FalseNegative:
-            counter_FN += 1
-        except FalsePositive:
-            counter_FP += 1
-        else:
-            counter_pass += 1
-
-    self.assertEqual(counter_pass, 6)
-    self.assertEqual(counter_FN, 0)
-    self.assertEqual(counter_FP, 0)
+        self.assertEqual(counter_pass, 46)
+        self.assertEqual(counter_FN, 0)
+        self.assertEqual(counter_FP, 0)
 
 
 if __name__ == '__main__':
