@@ -158,3 +158,9 @@ def validate_syntax(filename):
         exception = None
     result = ValidationResult(filename, exception)
     return result
+
+
+def validate_encoding(filename):
+    exception = Exception()
+    result = ValidationResult(filename, exception)
+    return result
