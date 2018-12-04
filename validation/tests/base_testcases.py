@@ -8,10 +8,12 @@ import tests.context
 from lxml import etree
 
 from collections import namedtuple
+from types import FunctionType
 
 import unittest
 import os
 import glob
+import functools
 
 # To allow consistent imports of pkg modules
 tests.context.main()
@@ -328,12 +330,70 @@ class FalseNegative(AssertionError):
     """Raise when the expectation and result do not match yet they should."""
 
 
+def decorate_tests(decorator):
+    """Create a metaclass to decorate test methods with the same decorator.
+
+    source: https://stackoverflow.com/a/10067363
+    """
+
+    def do_decorate(attr, value):
+        """Boolean check if an object should be decorated."""
+        flag = ('__' not in attr and
+                attr.lower().startswith("test_") and
+                isinstance(value, FunctionType))
+        return flag
+
+    class DecorateAll(type):
+        def __new__(cls, name, bases, dct):
+            for attr, value in dct.items():
+                if do_decorate(attr, value):
+                    dct[attr] = decorator(value)
+            return super(DecorateAll, cls).__new__(cls, name, bases, dct)
+        def __setattr__(self, attr, value):
+            if do_decorate(attr, value):
+                value = decorator(value)
+            super(DecorateAll, self).__setattr__(attr, value)
+    return DecorateAll
 
 
 class XMLValidation:
+    """Container of XMLValidation.TestCase and supporting functions."""
 
-    class TestCase(XMLValidationAbstractCase):
-        """Collection of XML validition tests, repeated for each validator."""
+    def verify_setUpClass(func):
+        """Decorator that verifies setUpClass assigned attributes were set."""
+
+        def verify_attributes(instance):
+            expected_attrs = ["criterion",
+                              "base_exc",
+                              "valid_file",
+                              "illegal_file",
+                              "result_type",
+                              "imported_validation_func"]
+            detected = {attr: hasattr(instance, attr) for attr in expected_attrs}
+            if not all(detected.values()):
+                missing = [attr for attr, isPresent in detected.items() if not isPresent]
+                missing = ",\n\t".join(missing)
+                msg = ("setUpClass method for this TestCase "
+                       f"'{instance.__class__.__name__}' needs to assign "
+                       "attributes. The following class attributes were "
+                       f"expected but not declared:\n\t{missing}")
+                raise NotImplementedError(msg)
+
+        functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            """Test method decorator"""
+            try:
+                verify_attributes(args[0])
+            except NotImplementedError:
+                raise
+            else:
+                return_val = func(*args, **kwargs)
+            return return_val
+        return wrapper
+
+
+    class TestCase(XMLValidationAbstractCase, metaclass=decorate_tests(verify_setUpClass)):
+        """Collection of validition related tests, repeated for each validator."""
 
         def _validator(self, *args, _func):
             """Basis for partialmethod"""
