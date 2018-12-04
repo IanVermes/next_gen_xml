@@ -5,8 +5,6 @@
 
 import tests.context
 
-from lxml import etree
-
 from collections import namedtuple
 from types import FunctionType
 
@@ -84,6 +82,7 @@ class XMLValidationAbstractCase(ExtendedTestCase):
                                  "unexpected exception: {exc}")
         cls.detail_msg = ("\nproperty.{attr}: {expect}, resValid: {actual}")
 
+        #Files
         resources = "tests/resources"
         resources = os.path.abspath(resources)
         assert os.path.isdir(resources), f"Could not find {resources}"
@@ -365,6 +364,7 @@ class XMLValidation:
         def verify_attributes(instance):
             expected_attrs = ["criterion",
                               "base_exc",
+                              "cause_exc",
                               "valid_file",
                               "illegal_file",
                               "result_type",
@@ -381,7 +381,7 @@ class XMLValidation:
 
         functools.wraps(func)
         def wrapper(*args, **kwargs):
-            """Test method decorator"""
+            # Test method decorator
             try:
                 verify_attributes(args[0])
             except NotImplementedError:
@@ -422,7 +422,7 @@ class XMLValidation:
         def test_failed_validation_result_has_correct_exception(self):
             filename = self.illegal_file
             expected_pkg_exc = self.base_exc
-            expected_cause_exc = etree.XMLSyntaxError
+            expected_cause_exc = self.cause_exc
 
             result = self.validator(filename)
 

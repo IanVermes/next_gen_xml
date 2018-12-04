@@ -51,6 +51,7 @@ class Passing(OrderedEnum):
     RULES = 40
     SCHEMA = 30
     SYNTAX = 20
+    ENCODING = 15
     FAILS = 10
 
     @classmethod
@@ -64,6 +65,7 @@ class Passing(OrderedEnum):
                      exceptions.RuleValidationError: 40,
                      exceptions.SchemaValidationError: 30,
                      exceptions.SyntaxValidationError: 20,
+                     exceptions.EncodingValidationError: 15,
                      exceptions.ValidationError: 10}
         value = exc_types[type(exc)]
         return Passing(value)
@@ -147,20 +149,6 @@ class ValidationResult(object):
 
     def __str__(self):
         return str(repr(self))
-
-
-def validate_syntax(filename):
-    try:
-        try:
-            etree.parse(filename)
-        except etree.XMLSyntaxError as cause:
-            raise exceptions.SyntaxValidationError() from cause
-    except exceptions.SyntaxValidationError as exc:
-        exception = exc
-    else:
-        exception = None
-    result = ValidationResult(filename, exception)
-    return result
 
 
 class EncodingOperations(object):
@@ -297,8 +285,44 @@ class EncodingOperations(object):
             value = list(value).pop()
             return value
 
+MY_PARSER = etree.XMLParser(encoding=None)
+
+def validate_syntax(filename):
+    try:
+        try:
+            etree.parse(filename, parser=MY_PARSER)
+        except etree.XMLSyntaxError as cause:
+            raise exceptions.SyntaxValidationError() from cause
+    except exceptions.SyntaxValidationError as exc:
+        exception = exc
+    else:
+        exception = None
+    result = ValidationResult(filename, exception)
+    return result
+
 
 def validate_encoding(filename):
-    exception = Exception()
+    get_encodings = EncodingOperations.get_detected_and_declared_encoding
+    try:
+        try:
+            detected_enc, declared_enc = get_encodings(filename)
+        except exceptions.EncodingOperationError as cause:
+            msg = ""
+            raise exceptions.EncodingValidationError(msg) from cause
+        except exceptions.UnexpectedDeclarationAbsent as cause:
+            msg = ""
+            raise exceptions.EncodingValidationError(msg) from cause
+        except ValueError as cause:
+            msg = ""
+            raise exceptions.EncodingValidationError(msg) from cause
+        mismatched_encoding = (detected_enc != declared_enc)
+        if mismatched_encoding:
+            msg = ""
+            cause = exceptions.EncodingOperationError()
+            raise exceptions.EncodingValidationError(msg) from cause
+    except exceptions.EncodingValidationError as exc:
+        exception = exc
+    else:
+        exception = None
     result = ValidationResult(filename, exception)
     return result

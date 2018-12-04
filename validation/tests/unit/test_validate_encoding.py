@@ -118,7 +118,6 @@ class TestEncodingOperations(XMLValidationAbstractCase):
                 self.assertEqual(isValid, assessment_flag)
 
 
-@unittest.skip("skip for now")
 class TestEncodingValidation(XMLValidation.TestCase):
 
     @classmethod
@@ -126,6 +125,7 @@ class TestEncodingValidation(XMLValidation.TestCase):
         super().setUpClass()
         cls.criterion = criterion = "encoding"
         cls.base_exc = exceptions.EncodingValidationError
+        cls.cause_exc = exceptions.NextGenError
         cls.valid_files = list(cls.get_resources_by_criterion("valid"))
         cls.valid_file = cls.valid_files[0]
         cls.illegal_file = next(cls.get_resources_by_criterion(criterion))

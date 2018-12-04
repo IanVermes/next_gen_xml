@@ -65,6 +65,10 @@ class SyntaxValidationError(ValidationError):
     """Validation error raised due to XML syntax errors."""
 
 
+class EncodingValidationError(ValidationError):
+    """Validation error raised due to problematic XML file encoding."""
+
+
 class SchemaValidationError(ValidationError):
     """Validation error raised due to XML failing against a Schema."""
 

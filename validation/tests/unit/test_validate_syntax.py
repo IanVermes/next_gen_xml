@@ -10,6 +10,8 @@ from tests.base_testcases import XMLValidation
 from helpers.xml import validate_syntax, ValidationResult
 import exceptions
 
+from lxml import etree
+
 import os
 import unittest
 
@@ -21,6 +23,7 @@ class TestSyntaxValidation(XMLValidation.TestCase):
         super().setUpClass()
         cls.criterion = criterion = "syntax"
         cls.base_exc = exceptions.SyntaxValidationError
+        cls.cause_exc = etree.XMLSyntaxError
         cls.valid_file = next(cls.get_resources_by_criterion("valid"))
         cls.illegal_file = next(cls.get_resources_by_criterion(criterion))
         cls.result_type = ValidationResult
