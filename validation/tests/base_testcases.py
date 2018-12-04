@@ -27,9 +27,9 @@ class ExtendedTestCase(unittest.TestCase):
         """Assert whether an object has the expected attribute."""
         if not hasattr(obj, attrname):
             if message is not None:
-                self.fail(message)
+                raise AssertionError(message)
             else:
-                self.fail(HAS_ATTR_MESSAGE.format(obj, attrname))
+                raise AssertionError(HAS_ATTR_MESSAGE.format(obj, attrname))
 
 
 class CommandLineTestCase(ExtendedTestCase):
@@ -72,7 +72,7 @@ class XMLValidationAbstractCase(ExtendedTestCase):
     def setUpClass(cls):
         cls.invalid_attr = invalid = "illegal"
         cls.valid_attr = valid = "valid"
-        criteria = f"{valid} {invalid} syntax document rules".split()
+        criteria = f"{valid} {invalid} syntax encoding document rules".split()
         FileProperties = namedtuple("FileProperties", criteria)
 
         # Strings
@@ -248,7 +248,7 @@ class XMLValidationAbstractCase(ExtendedTestCase):
             detail = detail.format(attr=criterion,
                                    expect=expectValid,
                                    actual=resValid)
-            self.fail(msg + detail)
+            raise AssertionError(msg + detail)
 
 
     def raisesIfNotTruePositive(self, result, expected, exception, expected_exceptions=None):
