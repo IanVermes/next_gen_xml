@@ -6,7 +6,7 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.base_testcases import XMLValidationTestCase
+from tests.base_testcases import XMLValidationAbstractCase
 from tests.base_testcases import FalseNegative, FalsePositive
 import exceptions
 
@@ -15,7 +15,7 @@ import os
 import unittest
 
 
-class Test_XMLValidationTestCase_Itself(XMLValidationTestCase):
+class Test_XMLValidationTestCase_Itself(XMLValidationAbstractCase):
     """This TestCase has a complicated setUpClass method and needs vetting."""
 
     def test_setupClass_files(self):

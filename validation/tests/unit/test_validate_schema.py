@@ -6,13 +6,13 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.base_testcases import XMLValidationTestCase
+from tests.base_testcases import XMLValidation
 import exceptions
 
 import unittest
 
 
-class TestSchemaValidation(XMLValidationTestCase):
+class TestSchemaValidation(XMLValidation.TestCase):
 
     @unittest.expectedFailure
     def test_fail(self):

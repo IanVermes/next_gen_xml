@@ -5,6 +5,8 @@
 
 import tests.context
 
+from lxml import etree
+
 from collections import namedtuple
 
 import unittest
@@ -62,7 +64,7 @@ class INIandSettingsTestCase(ExtendedTestCase):
             raise FileNotFoundError(msg)
 
 
-class XMLValidationTestCase(ExtendedTestCase):
+class XMLValidationAbstractCase(ExtendedTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -324,3 +326,66 @@ class FalsePositive(AssertionError):
 
 class FalseNegative(AssertionError):
     """Raise when the expectation and result do not match yet they should."""
+
+
+
+
+class XMLValidation:
+
+    class TestCase(XMLValidationAbstractCase):
+        """Collection of XML validition tests, repeated for each validator."""
+
+        def _validator(self, *args, _func):
+            """Basis for partialmethod"""
+            return _func(*args)
+
+        def validator(self, *args):
+            """Main validation function of the testcase."""
+            func = self.imported_validation_func[0]
+            result = func(*args)
+            return result
+
+        def test_validation_passes_with_valid_file(self):
+            filename = self.valid_file
+
+            result = self.validator(filename)
+
+            self.assertTrue(result)
+
+        def test_validation_fails_with_illegal_file(self):
+            filename = self.illegal_file
+
+            result = self.validator(filename)
+
+            self.assertFalse(result)
+
+        def test_failed_validation_result_has_correct_exception(self):
+            filename = self.illegal_file
+            expected_pkg_exc = self.base_exc
+            expected_cause_exc = etree.XMLSyntaxError
+
+            result = self.validator(filename)
+
+            with self.assertRaises(expected_pkg_exc):
+                raise result.exception
+            with self.assertRaises(expected_cause_exc):
+                raise result.exception.__cause__
+
+        def test_validation_returns_result_obj(self):
+            filename = self.illegal_file
+
+            result = self.validator(filename)
+
+            self.assertIsInstance(result, self.result_type)
+
+        def test_other_illegal_files_pass(self):
+            """Similar to test_nofalses_after_syntax_validation but explict."""
+            for filename, properties in self.files.items():
+                is_illegal = getattr(properties, self.invalid_attr)
+                has_syntax_err = getattr(properties, self.criterion)
+
+                if is_illegal and not has_syntax_err:
+                    with self.subTest(name=os.path.basename(filename)):
+                        result = self.validator(filename)
+
+                        self.assertTrue(result)
