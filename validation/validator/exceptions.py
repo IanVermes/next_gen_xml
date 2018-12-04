@@ -13,6 +13,7 @@ Copyright Ian Vermes 2018
 class NextGenError(Exception):
     """Base exception for this package."""
 
+# File operations
 
 class FileNotFound(NextGenError):
     """Could not find a file within the filesystem."""
@@ -29,10 +30,32 @@ class ParentDirNotFound(DirNotFound):
 class UnnaceptableDirName(DirNotFound):
     """Cannot use empty string '' as local directory name, use './' instead."""
 
+# Enum operations
 
 class UnexpectedEnum(NextGenError):
     """Enum is not valid."""
 
+# Encoding operations
+
+class UnexpectedDeclarationAbsent(NextGenError):
+    """XML declaration is missing."""
+
+class EncodingOperationError(NextGenError):
+    """Base error for the EncodingOperations class."""
+
+
+class DeclarationEncodingEmptyString(EncodingOperationError):
+    """XML declaration has an encoding attribute but its value is empty."""
+
+
+class DeclarationEncodingBadQuoteSyntax(EncodingOperationError):
+    """XML declaration has an encoding attribute with a syntax error."""
+
+
+class DeclarationHasNoEncoding(EncodingOperationError):
+    """XML declaration has no encoding attribute."""
+
+# Validation operations
 
 class ValidationError(NextGenError):
     """Base exception for XML validation."""
