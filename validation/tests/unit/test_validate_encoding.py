@@ -39,7 +39,7 @@ class TestEncodingOperations(XMLValidationAbstractCase):
                                    if f.endswith(is_ascii_1) or f.endswith(is_ascii_2)]
         assert len(cls.ascii_files) == 2
 
-    def test_grep_declaration_encoding(self):
+    def test_grep_declaration_encoding(self, strict=True):
         declarations = {
                 """<?xml version="1.0" encoding="utf-16"?>\r\n""": "utf-16",
                 """<?xml version="1.0" encoding="utf-8"?>�""": "utf-8",
@@ -48,15 +48,20 @@ class TestEncodingOperations(XMLValidationAbstractCase):
                 """<?xml version="1.0" encoding="rabbit"?>\r\n""": "rabbit",
                 """<?xml version="1.0"?>\n""": ""
                 }
+        func = EncodingOperations.grep_declaration_encoding
         for decl, expected_enc in declarations.items():
             with self.subTest(encoding=expected_enc):
                 try:
-                    result = EncodingOperations.grep_declaration_encoding(decl)
+                    result = func(decl, strict)
                 except Exception as exc:
-                    with self.assertRaises(exceptions.NextGenError):
+                    with self.assertRaises(exceptions.EncodingOperationError):
                         raise exc
                 else:
                     self.assertEqual(result, expected_enc)
+
+    def test_grep_declaration_encoding_supress_errors(self):
+        strict = False
+        self.test_grep_declaration_encoding(strict)
 
     def test_detect_file_encoding(self):
         for file in self.encoding_files:

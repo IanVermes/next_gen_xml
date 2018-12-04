@@ -241,13 +241,22 @@ class EncodingOperations(object):
         return detected_enc
 
     @classmethod
-    def grep_declaration_encoding(cls, string):
+    def grep_declaration_encoding(cls, string, strict=True):
         """Get the encoding substring from the declaration string.
 
         Args:
             string(str): First line of an XML file.
+        Kwargs:
+            strict(bool): If True, raise legal exception, otherwise return value is an empty string.
         Return:
             str
+        Exceptions:
+            exceptions.DeclarationHasNoEncoding (legal)
+            exceptions.DeclarationEncodingEmptyString (legal)
+            exceptions.DeclarationEncodingBadQuoteSyntax (legal)
+
+            exceptions.DeclarationAbsent (illegal)
+            ValueError (illegal)
         """
         # Is declaration?
         if "<?" not in string:
@@ -262,18 +271,27 @@ class EncodingOperations(object):
             if all(groups):
                 result.append(groups)
         if not (0 < len(result) < 2):
-            if "encoding" not in string:
-                msg = f"No 'encoding' attribute in declaration: {string}"
-                raise exceptions.DeclarationHasNoEncoding(msg)
-            elif 'encoding=\"\"' in string or "encoding=\'\'" in string:
-                msg = f"Declaration 'encoding' attribute is an empty string: {string}"
-                raise exceptions.DeclarationEncodingEmptyString(msg)
-            elif 'encoding=\"' in string or "encoding=\'" in string:
-                msg = f"Declaration 'encoding' attribute is malformed string: {string}"
-                raise exceptions.DeclarationEncodingBadQuoteSyntax(msg)
-            else:
-                msg = f"Cannot grep the value of the 'encoding' attribute: {string}."
-                raise ValueError(msg)
+            try:
+                if "encoding" not in string:
+                    msg = f"No 'encoding' attribute in declaration: {string}"
+                    raise exceptions.DeclarationHasNoEncoding(msg)
+                elif 'encoding=\"\"' in string or "encoding=\'\'" in string:
+                    msg = f"Declaration 'encoding' attribute is an empty string: {string}"
+                    raise exceptions.DeclarationEncodingEmptyString(msg)
+                elif 'encoding=\"' in string or "encoding=\'" in string:
+                    msg = f"Declaration 'encoding' attribute is malformed string: {string}"
+                    raise exceptions.DeclarationEncodingBadQuoteSyntax(msg)
+                else:
+                    msg = f"Cannot grep the value of the 'encoding' attribute: {string}."
+                    raise ValueError(msg)
+            except exceptions.EncodingOperationError:
+                if strict:
+                    raise
+                else:
+                    value = ""
+                    return value
+            except ValueError:
+                raise
         else:
             value = itertools.chain.from_iterable(result)
             value = list(value).pop()
