@@ -6,8 +6,8 @@
 Copyright Ian Vermes 2018
 """
 
-from tests.base_testcases import XMLValidation, XMLValidationAbstractCase
-from helpers.xml import validate_encoding, ValidationResult, EncodingOperations
+from tests.base_testcases import XMLValidationAbstractCase
+from helpers.xml import handle_encoding_errors, EncodingOperations, EncodingErrorCode
 import exceptions
 
 from lxml import etree
@@ -15,8 +15,67 @@ import chardet
 
 import os
 import unittest
-import functools
 from itertools import chain
+
+
+class TestSyntaxErrorEncodingHandler(XMLValidationAbstractCase):
+
+    @classmethod
+    def get_syntax_errors(cls, filename):
+        try:
+            etree.parse(filename, parser=cls.parser)
+        except etree.XMLSyntaxError as exc:
+            result = exc
+        else:
+            result = None
+        return result
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.parser = None
+        cls.syntax_errors = {file: (properties, cls.get_syntax_errors(file)) for file, properties in cls.files.items()}
+
+    def test_only_processes_syntax_errors(self):
+        filename = "foobar.xml"
+        exc = Exception("Generic Exception")
+
+        with self.assertRaises(TypeError):
+            handle_encoding_errors(filename, exc)
+
+    def test_enum_accepts_syntax_exc_codes_or_None(self):
+        enum_members = set(EncodingErrorCode)
+        for file, (_, exc) in self.syntax_errors.items():
+            exc_code = getattr(exc, "code", None)
+
+            this_enum = EncodingErrorCode(exc_code)
+            self.assertIn(this_enum, enum_members)
+
+    def test_enum_values_are_not_arbitrary(self):
+        exemptions = (0, 1000)
+        iter_enum = (m for m in EncodingErrorCode
+                             if min(exemptions) < m.value < max(exemptions))
+        for member in iter_enum:
+            with self.subTest(enum=repr(member)):
+
+                err_name = etree.ErrorTypes._getName(member.value)
+
+                self.assertEqual(err_name, member.name)
+
+    def test_files_with_encoding_problems_have_non_zero_enum(self):
+        for file, (properties, exc) in self.syntax_errors.items():
+            has_encoding_problem = getattr(properties, "encoding")
+            exc_code = exc_code = getattr(exc, "code", None)
+            with self.subTest(code=exc_code, file=os.path.basename(file)):
+
+                this_enum = EncodingErrorCode(exc_code)
+                if has_encoding_problem:
+                    self.assertGreater(this_enum, EncodingErrorCode.NOT_ENCODING_ERR)
+                else:
+                    self.assertEqual(this_enum, EncodingErrorCode.NOT_ENCODING_ERR)
+
+
+
 
 class TestEncodingOperations(XMLValidationAbstractCase):
 
@@ -117,26 +176,5 @@ class TestEncodingOperations(XMLValidationAbstractCase):
 
                 self.assertEqual(isValid, assessment_flag)
 
-
-class TestEncodingValidation(XMLValidation.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.criterion = criterion = "encoding"
-        cls.base_exc = exceptions.EncodingValidationError
-        cls.cause_exc = exceptions.NextGenError
-        cls.valid_files = list(cls.get_resources_by_criterion("valid"))
-        cls.valid_file = cls.valid_files[0]
-        cls.illegal_file = next(cls.get_resources_by_criterion(criterion))
-        cls.result_type = ValidationResult
-        cls.imported_validation_func = (validate_encoding, )
-
-
-    def test_nofalses_after_encoding_validation(self):
-
-        kwargs = {"values": self.files,
-                  "criterion": self.criterion,
-                  "validator": self.validator,
-                  "permitted_exceptions": self.base_exc}
-        self.assertNoFalsePositivesOrNegatives(**kwargs)
+if __name__ == '__main__':
+    unittest.main()

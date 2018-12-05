@@ -71,6 +71,22 @@ class Passing(OrderedEnum):
         return Passing(value)
 
 
+class EncodingErrorCode(OrderedEnum):
+    NOT_ENCODING_ERR = 0
+    ERR_DOCUMENT_EMPTY = 4
+    ERR_UNSUPPORTED_ENCODING = 32
+    ERR_ENCODING_NAME = 79
+    ERR_INVALID_ENCODING = 81
+
+    @classmethod
+    def _missing_(cls, value):
+        default = 0
+        for item in cls:
+            if item.value == value:
+                return item
+            else:
+                return cls(default)
+
 class ValidationResult(object):
     """Result object spawned by validation functions and methods.
 
@@ -292,6 +308,7 @@ def validate_syntax(filename):
         try:
             etree.parse(filename, parser=MY_PARSER)
         except etree.XMLSyntaxError as cause:
+            cause = handle_encoding_errors(filename, cause)
             raise exceptions.SyntaxValidationError() from cause
     except exceptions.SyntaxValidationError as exc:
         exception = exc
@@ -300,6 +317,11 @@ def validate_syntax(filename):
     result = ValidationResult(filename, exception)
     return result
 
+def handle_encoding_errors(filename, cause):
+    if not isinstance(cause, etree.XMLSyntaxError):
+        msg = f"Only handles etree.XMLSyntaxError errors not {repr(cause)}"
+        raise TypeError(msg)
+    return cause
 
 def validate_encoding(filename):
     get_encodings = EncodingOperations.get_detected_and_declared_encoding
