@@ -35,6 +35,19 @@ class CommandLineArgumentTest(CommandLineTestCase):
 
         self.assertEqual(args.directory, self.dir_valid)
 
+    def test_parse_multiple_valid_dir(self):
+        self.fail("test not written")
+
+    def test_parse_multiple_valid_file(self):
+        self.fail("test not written")
+
+    def test_parse_multiple_valid_files_dirs_mixed(self):
+        """Mixed positional args."""
+        self.fail("test not written")
+
+    def test_parser_output_is_list_of_pathlibPaths(self):
+        self.fail("test not written")
+
     def test_parse_invalid_dir(self):
         cmd = "{}".format(shlex.quote(self.dir_invalid))
         cmd = shlex.split(cmd)
@@ -51,7 +64,7 @@ class CommandLineArgumentTest(CommandLineTestCase):
         self.assertIn(substring_1, stderr_output)
         self.assertIn(substring_2, stderr_output)
 
-
+    @unittest.expectedFailure
     def test_parse_valid_file_rather_than_dir(self):
         cmd = "{}".format(shlex.quote(self.file_valid))
         cmd = shlex.split(cmd)
