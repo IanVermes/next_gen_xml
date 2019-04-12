@@ -123,6 +123,28 @@ class Integration_CommandLine_Entry(CommandLineTestCase):
         self.assertNotEqual(status, 0, msg=cmd)
         self.assertIn(self.error_text, stdout.lower())
 
+    def test_user_supplies_mutliple_positional_arguments(self):
+        """User can use N positional args that are a mix of files & dirs."""
+        quote = shlex.quote
+        userdir1 = "tests/unit"
+        userdir2 = "tests/resources"
+        userfile1 = "tests/resources/valid.xml"
+        userfile2 = "tests/resources/illegal_document_bad_isbn.xml"
+
+        args = [userdir1, userdir2, userfile1, userfile2]
+        # Precondition
+        for path in args:
+            self.assertTrue(os.path.exists(path), msg="Precondition!")
+
+        args_string = " ".join([quote(p) for p in args])
+        cmd = self.unformatted_cmd
+        cmd = cmd.format(quote(self.entry_point_py), args_string)
+
+
+        status = 0
+        stdout = self.invoke_cmd_via_commandline(cmd, expected_status=status)
+        self.assertIn("done!", stdout)
+
 
 if __name__ == '__main__':
     unittest.main()
