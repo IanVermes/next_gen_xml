@@ -15,11 +15,14 @@ import enum
 import re
 import itertools
 
-class OrderedEnum(enum.Enum):
+
+# Deprecting
+class _OrderedEnum(enum.Enum):
     """An ordered enumeration that is not based on IntEnumself.
 
     From: https://docs.python.org/3/library/enum.html#orderedenum
     """
+    raise NotImplementedError("This class has been transfered to its own module.")
     def __ge__(self, other):
         if self.__class__ is other.__class__:
             return self.value >= other.value
@@ -37,8 +40,8 @@ class OrderedEnum(enum.Enum):
             return self.value < other.value
         return NotImplemented
 
-
-class Passing(OrderedEnum):
+# Deprecting
+class _Passing(OrderedEnum):
     """Enum for evaluating the various pass/failure validation states of XML.
 
     The Enum members allow comparison but do not otherwise behave like its.
@@ -47,6 +50,7 @@ class Passing(OrderedEnum):
         from_exception(Exception, None): Generate an Enum instance appropriate
             to the specific exception.
     """
+    raise NotImplementedError("This class has been transfered to its own module.")
     PASSING = 50
     RULES = 40
     SCHEMA = 30
@@ -70,13 +74,16 @@ class Passing(OrderedEnum):
         value = exc_types[type(exc)]
         return Passing(value)
 
-
-class EncodingErrorCode(OrderedEnum):
+# Deprecting
+class _EncodingErrorCode(OrderedEnum):
+    raise NotImplementedError("This class has been transfered to its own module.")
     NOT_ENCODING_ERR = 0
     ERR_DOCUMENT_EMPTY = 4
+    ERR_UNKNOWN_ENCODING = 31
     ERR_UNSUPPORTED_ENCODING = 32
     ERR_ENCODING_NAME = 79
     ERR_INVALID_ENCODING = 81
+    ERR_MISSING_ENCODING = 101
 
     @classmethod
     def _missing_(cls, value):
@@ -307,6 +314,11 @@ def validate_syntax(filename):
     try:
         try:
             etree.parse(filename, parser=MY_PARSER)
+            # TODO Mismatched encoded files will slip through without raising an
+            # exception. It is at this point that you examine for mismatch.
+            # Mismatches should raise either ERR_DOCUMENT_EMPTY:4 or
+            # ERR_INVALID_ENCODING:81.
+            raise_if_mismatched_encodings(filename)
         except etree.XMLSyntaxError as cause:
             cause = handle_encoding_errors(filename, cause)
             raise exceptions.SyntaxValidationError() from cause
@@ -317,13 +329,24 @@ def validate_syntax(filename):
     result = ValidationResult(filename, exception)
     return result
 
+
+def raise_if_mismatched_encodings(filename):
+    raise NotImplementedError("Read TODO comments in validate_syntax() and handle_encoding_errors().")
+
+
 def handle_encoding_errors(filename, cause):
     if not isinstance(cause, etree.XMLSyntaxError):
         msg = f"Only handles etree.XMLSyntaxError errors not {repr(cause)}"
         raise TypeError(msg)
+    # TODO     NOT_ENCODING_ERR:0 is a superset of ERR_DOCUMENT_EMPTY:4. The
+    # ERR_DOCUMENT_EMPTY:4 may silently pass when the parser encoding is not set
+    # and will choose an appropriate encoding. However we are still letting
+    # mismathed encoding slip through. Such events indcate the file is invalid.
+
     return cause
 
 def validate_encoding(filename):
+    raise DeprecationWarning("Mothball this function.")
     get_encodings = EncodingOperations.get_detected_and_declared_encoding
     try:
         try:

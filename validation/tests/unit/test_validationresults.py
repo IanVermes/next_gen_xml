@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import ExtendedTestCase
-from helpers.xml import ValidationResult
+from helpers.result import ValidationResult
 
 import exceptions as pkg_excs
 
