@@ -7,8 +7,9 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import XMLValidationAbstractCase
-from helpers.xml import handle_encoding_errors, EncodingOperations, EncodingErrorCode
+from helpers.checkencoding import handle_encoding_errors, EncodingOperations
 from helpers.enum import EncodingErrorCode
+
 import exceptions
 
 from lxml import etree
@@ -34,7 +35,7 @@ class TestSyntaxErrorEncodingHandler(XMLValidationAbstractCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.parser = None
+        cls.parser = etree.XMLParser(encoding=None)
         cls.syntax_errors = {file: (properties, cls.get_syntax_errors(file)) for file, properties in cls.files.items()}
 
     def test_only_processes_syntax_errors(self):
