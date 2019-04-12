@@ -9,7 +9,7 @@ Copyright Ian Vermes 2018
 from helpers.enum import Check
 import exceptions
 
-import os
+import pathlib
 
 
 def expandpath(filename, exists=False, dir_exists=True):
@@ -38,26 +38,27 @@ def expandpath(filename, exists=False, dir_exists=True):
         check = Check.DONT
     else:
         msg = ("Unexpected kwarg combination: "
-               f"dir_exists: {dir_exists}, "
-               f"exists: {exists}.")
+               f"dir_exists={dir_exists}, "
+               f"exists={exists}.")
         raise ValueError(msg)
 
-    expandpath = os.path.abspath(os.path.expanduser(filename))
+    filename = pathlib.Path(filename).expanduser()
 
     if check is Check.PARENT_ONLY:
-        dirname = os.path.dirname(expandpath)
-        extant = os.path.isdir(dirname)
+        dirname = filename.parent
+        extant = dirname.exists()
     elif check is Check.EXISTS:
-        extant = os.path.exists(expandpath)
+        extant = filename.exists()
     elif check is Check.DONT:
         extant = True
     else:
         raise exceptions.UnexpectedEnum(repr(check))
 
     if not extant:
+        msg = "{file} does not exist."
         if check is Check.EXISTS:
-            raise exceptions.FileNotFound(expandpath)
+            raise exceptions.FileNotFound(msg.format(file=filename))
         elif check is Check.PARENT_ONLY:
-            raise exceptions.ParentDirNotFound(expandpath)
+            raise exceptions.ParentDirNotFound(msg.format(file=filename.parent))
     else:
-        return expandpath
+        return str(filename.absolute())
