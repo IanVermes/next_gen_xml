@@ -14,6 +14,7 @@ from collections import namedtuple
 import unittest
 import os
 import getpass
+import pathlib
 
 PathDetail = namedtuple("PathDetail", "name desc expandedname touched valid")
 
@@ -88,7 +89,7 @@ class TestExpandPath(ExtendedTestCase):
                 continue # Forgive package else:exceptions as they're to handled.
             else:
                 with self.subTest(filename=detail.name):
-                    expected = detail.expandedname
+                    expected = pathlib.Path(detail.expandedname)
                     msg = f"Did not expand '{filename}' into '{expected}'."
                     self.assertEqual(expandedname, expected, msg=msg)
 

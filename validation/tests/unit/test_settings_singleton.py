@@ -13,6 +13,7 @@ import exceptions  # from validator import exceptions
 import unittest
 import os
 import time
+import pathlib
 from io import StringIO
 from contextlib import redirect_stdout
 
@@ -193,7 +194,7 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         isAbsolute = dest_dir.startswith("/")
         isExpandedUser = "~" in dest_dir
 
-        self.assertIsInstance(var, str)
+        self.assertIsInstance(var, (str, pathlib.Path))
         self.assertTrue(os.path.isdir(dest_dir), f"Dir: {dest_dir}")
         self.assertTrue(isAbsolute, f"Dir: {dest_dir} is not an absolute path.")
         self.assertFalse(isExpandedUser, f"Dir: {dest_dir} needs userexpansion.")

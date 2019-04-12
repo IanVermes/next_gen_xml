@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 import exceptions
-import helpers.path as path
+import helpers.path
 
 import configparser
 import enum
@@ -125,5 +125,6 @@ class Settings(metaclass=Singleton):
     def _attr_get_log_filename(self):
         option = "log_filename"
         filename = self._get_value_from_config(option)
-        filename = path.expandpath(filename, exists=False, dir_exists=True)
+        filename = helpers.path.expandpath(filename,
+                                           exists=False, dir_exists=True)
         return filename

@@ -24,7 +24,7 @@ def expandpath(filename, exists=False, dir_exists=True):
             Useful if you wish to validate the target destination before
             writing a file.
     Return
-        str
+        pathlib.Path
     Exceptions:
         validator.exceptions.FileNotFound
         validator.exceptions.DirNotFound
@@ -61,4 +61,4 @@ def expandpath(filename, exists=False, dir_exists=True):
         elif check is Check.PARENT_ONLY:
             raise exceptions.ParentDirNotFound(msg.format(file=filename.parent))
     else:
-        return str(filename.absolute())
+        return filename.absolute()
