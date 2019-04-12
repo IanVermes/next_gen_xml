@@ -8,19 +8,10 @@ Copyright Ian Vermes 2018
 
 import exceptions
 import helpers.path
+from helpers.enum import Mode
 
 import configparser
-import enum
 import os
-
-
-class Mode(enum.Enum):
-    LIVE = 1
-    TEST = 2
-
-    @classmethod
-    def get_default(cls):
-        return cls.LIVE
 
 
 class Singleton(type):
@@ -34,6 +25,7 @@ class Singleton(type):
     control in case you need to customize the singleton class definitions in
     other ways.
     """
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -43,7 +35,7 @@ class Singleton(type):
 
     @classmethod
     def reset_singleton(self, class_):
-        "Support method for unittesting: reset a preiously instantiated singleton."
+        """Support method for unittesting: reset a preiously instantiated singleton."""
         metaclass = type(self)
         if isinstance(class_, metaclass):
             singleton = self._instances.pop(class_)

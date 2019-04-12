@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 """This package uses enums for a variety of uses:
+* Mode: Software mode.
 * Passing: Describes the validity of XML in greater detail than True or False
 * Check: On-disk file state
 * EncodingError: EncodingError <-> etree.XMLParser error codes relationship
 
 Classes:
+    Mode
     Check
     Passing
     EncodingErrorCode
@@ -19,6 +21,16 @@ Copyright Ian Vermes 2019
 import exceptions
 
 import enum
+
+
+class Mode(enum.Enum):
+    """An enumeration of the software environment/mode."""
+    LIVE = 1
+    TEST = 2
+
+    @classmethod
+    def get_default(cls):
+        return cls.LIVE
 
 
 class Check(enum.Enum):
