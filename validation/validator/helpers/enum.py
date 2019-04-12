@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 """This package uses enums for a variety of uses:
-* Describing the validity of an XML in greater detail than True or False
-*
+* Passing: Describes the validity of XML in greater detail than True or False
+* Check: On-disk file state
+* EncodingError: EncodingError <-> etree.XMLParser error codes relationship
 
 Classes:
-    OrderedEnum
+    Check
     Passing
     EncodingErrorCode
+
+Base classes:
+    OrderedEnum
 
 Copyright Ian Vermes 2019
 """
@@ -15,6 +19,14 @@ Copyright Ian Vermes 2019
 import exceptions
 
 import enum
+
+
+class Check(enum.Enum):
+    """An Enum used in validation of fileo peration."""
+    DONT = 1
+    EXISTS = 2
+    PARENT_ONLY = 3
+    # Permsissions?
 
 
 class OrderedEnum(enum.Enum):

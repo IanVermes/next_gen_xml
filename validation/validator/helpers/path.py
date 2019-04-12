@@ -6,18 +6,10 @@
 Copyright Ian Vermes 2018
 """
 
+from helpers.enum import Check
 import exceptions
 
 import os
-import enum
-
-
-class Check(enum.Enum):
-    """An Enum used in validation of fileoperation"""
-    DONT = 1
-    EXISTS = 2
-    PARENT_ONLY = 3
-    # Permsissions?
 
 
 def expandpath(filename, exists=False, dir_exists=True):
