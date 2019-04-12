@@ -7,6 +7,7 @@
 Classes:
     OrderedEnum
     Passing
+    EncodingErrorCode
 
 Copyright Ian Vermes 2019
 """
@@ -74,3 +75,22 @@ class Passing(OrderedEnum):
                      exceptions.ValidationError: 10}
         value = exc_types[type(exc)]
         return Passing(value)
+
+
+class EncodingErrorCode(OrderedEnum):
+    NOT_ENCODING_ERR = 0
+    ERR_DOCUMENT_EMPTY = 4
+    ERR_UNKNOWN_ENCODING = 31
+    ERR_UNSUPPORTED_ENCODING = 32
+    ERR_ENCODING_NAME = 79
+    ERR_INVALID_ENCODING = 81
+    ERR_MISSING_ENCODING = 101
+
+    @classmethod
+    def _missing_(cls, value):
+        default = 0
+        for item in cls:
+            if item.value == value:
+                return item
+            else:
+                return cls(default)

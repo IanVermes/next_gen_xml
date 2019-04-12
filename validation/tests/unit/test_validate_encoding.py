@@ -8,6 +8,7 @@ Copyright Ian Vermes 2018
 
 from tests.base_testcases import XMLValidationAbstractCase
 from helpers.xml import handle_encoding_errors, EncodingOperations, EncodingErrorCode
+from helpers.enum import EncodingErrorCode
 import exceptions
 
 from lxml import etree
