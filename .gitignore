@@ -107,7 +107,11 @@ Validation_notebook.ipynb
 notes_and_thoughts.txt
 
 # Actual project ignores
-validation/tests/logs
+
 validation/tests/resources/*
+validation/tests/logs
+updated_schema/
+recompose/
 demo
 *.ipynb
+*.zip
