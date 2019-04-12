@@ -65,18 +65,41 @@ class TestSyntaxErrorEncodingHandler(XMLValidationAbstractCase):
                 self.assertEqual(err_name, member.name)
 
     def test_files_with_encoding_problems_have_non_zero_enum(self):
+        basenames = {k: os.path.basename(k) for k in self.syntax_errors.keys()}
+        soft_exceptions = {"illegal_syntax_declaration_encoding_mismatch_4.xml",
+                           "illegal_syntax_declaration_encoding_value_4.xml"}
+        expeted_enum = EncodingErrorCode.NOT_ENCODING_ERR
+
         for file, (properties, exc) in self.syntax_errors.items():
             has_encoding_problem = getattr(properties, "encoding")
-            exc_code = exc_code = getattr(exc, "code", None)
-            with self.subTest(code=exc_code, file=os.path.basename(file)):
+            exc_code = getattr(exc, "code", None)
+            with self.subTest(code=exc_code, file=basenames[file]):
 
+                # Some files are coming back as false negative - these are 'soft
+                # exceptions' as they are edge cases and not a priority right
+                # now.
+                if basenames[file] in soft_exceptions:
+                    base = basenames[file]
+                    msg = (f"\n*** The file '{base}' is a known edge case and "
+                           "appears as a false positive when it should be "
+                           "failing. This is because etree.parse is not "
+                           "failing when it parses these files. Regex-ing the "
+                           "declartion would show they're not valid XML "
+                           "declarations but etree.parse is too tolerent. The "
+                           "solution would be to change the impementation of "
+                           f"{self.__class__.__name__}.get_syntax_errors as "
+                           "relies SOLELY on etree.parse to identify all the "
+                           "encoding/syntax errors.")
+                    detail = ', '.join(soft_exceptions)
+                    extra = (f"\n\n*** known edgecases: {detail}")
+                    msg += extra
+                else:
+                    msg = ""
                 this_enum = EncodingErrorCode(exc_code)
                 if has_encoding_problem:
-                    self.assertGreater(this_enum, EncodingErrorCode.NOT_ENCODING_ERR)
+                    self.assertGreater(this_enum, expeted_enum, msg=msg)
                 else:
-                    self.assertEqual(this_enum, EncodingErrorCode.NOT_ENCODING_ERR)
-
-
+                    self.assertEqual(this_enum, expeted_enum)
 
 
 class TestEncodingOperations(XMLValidationAbstractCase):

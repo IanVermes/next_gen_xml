@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 """A collection of classes & functions for validating XML encoding.
 
+
+Classes:
+    EncodingOperations
+
 Copyright Ian Vermes 2018
 """
 
