@@ -6,12 +6,31 @@
 Copyright Ian Vermes 2018
 """
 
-import argparse
+from argparse import ArgumentParser, ArgumentTypeError
+
 import os
 
 
 class NextGenArgParse(object):
-    """Process the command line args for the purposes of satisfying main()."""
+    """Process the command line args for the purposes of satisfying core.main().
+
+    The interface for the program allows multiple positional arguments and an
+    optional mode flag. The positional arguments should be file or directory
+    paths.
+
+    The file paths should be XML files, though the .xml file extension is not
+    essential.
+
+    The directory path should contain XML files with .xml file extensions at the
+    next directory level. The search for .xml files is not recursive and hence
+    will not search through subdirectories.
+
+    Usage:
+
+    >>> from argparse import ArgumentParser, ArgumentTypeError
+    >>> argparser = NextGenArgParse()
+    >>> kwargs = argparser.get_args()
+    """
 
     @staticmethod
     def is_valid_directory(dir):
@@ -22,12 +41,12 @@ class NextGenArgParse(object):
                 return_obj = dir
             elif os.path.isfile(dir):
                 msg = f"Expected a directory not file, got '{dir}'."
-                return_obj = argparse.ArgumentTypeError(msg)
+                return_obj = ArgumentTypeError(msg)
             else:
                 return_obj = TypeError(dir)
         else:
             msg = f"The location '{dir}' does not exist!"
-            raise argparse.ArgumentTypeError(msg)
+            raise ArgumentTypeError(msg)
 
         if isinstance(return_obj, Exception):
             raise return_obj
@@ -36,7 +55,7 @@ class NextGenArgParse(object):
 
     def _make_parser(self):
         description = 'Validate XML in a directory against a schema and python encoded rules.'
-        parser = argparse.ArgumentParser(description=description)
+        parser = ArgumentParser(description=description)
         parser.add_argument("directory",
                             metavar="DIR",
                             type=lambda x: self.is_valid_directory(x),
