@@ -9,6 +9,7 @@ Copyright Ian Vermes 2018
 from argparse import ArgumentParser, ArgumentTypeError
 
 import os
+import pathlib
 
 
 class NextGenArgParse(object):
@@ -32,20 +33,33 @@ class NextGenArgParse(object):
     >>> kwargs = argparser.get_args()
     """
 
-    @staticmethod
-    def is_valid_directory(dir):
-        """Validate that the directory is genuine not just a string."""
-        return_obj = ""
-        if os.path.exists(dir):
-            if os.path.isdir(dir):
-                return_obj = dir
-            elif os.path.isfile(dir):
-                msg = f"Expected a directory not file, got '{dir}'."
-                return_obj = ArgumentTypeError(msg)
+    GLOB_PATTERN = "*.xml"
+
+    @classmethod
+    def is_valid_path(cls, filename):
+        """Validate that the file or directory exists and not just a string."""
+        filepath = pathlib.Path(filename)
+        if filepath.exists():
+            if filepath.is_dir():
+                xmls = list(filepath.glob(cls.GLOB_PATTERN))
+                if len(xmls) > 0:
+                    return_obj = filepath
+                else:
+                    msg = (f"Got a directory '{str(filepath)}' which does not "
+                           "contain any files that match the "
+                           f"'{cls.GLOB_PATTERN}' pattern.")
+                    return_obj = ArgumentTypeError(msg)
+            elif filepath.is_file():
+                if filepath.suffix in cls.GLOB_PATTERN:
+                    return_obj = filepath
+                else:
+                    msg = (f"Got a file '{str(filepath)}' which does not "
+                           f"satisfy the '{cls.GLOB_PATTERN}' pattern.")
+                    return_obj = ArgumentTypeError(msg)
             else:
-                return_obj = TypeError(dir)
+                return_obj = TypeError(filepath)
         else:
-            msg = f"The location '{dir}' does not exist!"
+            msg = f"Got the path '{filepath}' but it does not exist."
             raise ArgumentTypeError(msg)
 
         if isinstance(return_obj, Exception):
@@ -56,14 +70,17 @@ class NextGenArgParse(object):
     def _make_parser(self):
         description = 'Validate XML in a directory against a schema and python encoded rules.'
         parser = ArgumentParser(description=description)
-        parser.add_argument("directory",
-                            metavar="DIR",
-                            type=lambda x: self.is_valid_directory(x),
-                            help="the directory for the program to process.")
+        parser.add_argument("xmls",
+                            metavar="PATHS",
+                            nargs="*",
+                            type=lambda x: self.is_valid_path(x),
+                            help=("Multiple positional arguments that consist of file or directory paths."
+                                  "\n  Directory paths will be searched for XML."
+                                  "\n  File paths must have .xml file extensions."))
         parser.add_argument("-t", "--test",
                             dest='testmode',
                             action='store_true',
-                            help="if provided run in testmode")
+                            help="If provided run in testmode")
         return parser
 
     def get_args(self):

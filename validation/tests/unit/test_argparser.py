@@ -29,31 +29,23 @@ class CommandLineArgumentTest(CommandLineTestCase):
     def tearDown(self):
         self.stderr_bypass.close()
 
-    def test_parse_valid_dir(self):
-        cmd = "{}".format(shlex.quote(self.dir_valid))
-        cmd = shlex.split(cmd)
+    def test_parse_valid_path(self):
+        files = {"file": self.file_valid, "dir": self.dir_valid}
+        for path_type, path in files.items():
+            with self.subTest(path_type=path_type):
+                self.assertTrue(os.path.exists(path), msg="Precondition!")
 
-        args = self.parser.parse_args(cmd)
+                cmd = "{}".format(shlex.quote(path))
+                cmd = shlex.split(cmd)
 
-        # Test 1: multiple item in args.files == number of glob(dir/*.xml)
-        xmls_in_dir = glob.glob(os.path.join(self.dir_valid, "*.xml"))
-        self.assertEqual(len(args.xmls), len(xmls_in_dir))
+                args = self.parser.parse_args(cmd)
 
-        # Test 2: the files in arg.xmls == the files in the glob
-        self.assertSetEqual(set(xmls_in_dir), set(args.xmls))
+                # Test 1: only one item in args.xmls
+                self.assertEqual(len(args.xmls), 1)
 
-    def test_parse_valid_file(self):
-        cmd = "{}".format(shlex.quote(self.file_valid))
-        cmd = shlex.split(cmd)
-
-        args = self.parser.parse_args(cmd)
-
-        # Test 1: only one item in args.files
-        self.assertEqual(len(args.xmls), 1)
-
-        # Test 2: the single args.files item == self.file_valid
-        item = args.xmls[0]
-        self.assertEqual(item, self.file_valid)
+                # Test 2: the single args.xmls item == self.file_valid
+                item = args.xmls[0]
+                self.assertEqual(str(item), path)
 
     def test_parse_multiple_valid_dir(self):
         self.fail("test not written")
