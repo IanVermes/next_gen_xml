@@ -13,8 +13,8 @@ import io
 import argparse
 import unittest
 import shlex
-import glob
 import os
+import pathlib
 
 from contextlib import redirect_stderr
 
@@ -93,7 +93,20 @@ class CommandLineArgumentTest(CommandLineTestCase):
                 self.assertListEqual(args, paths)
 
     def test_parser_output_is_list_of_pathlibPaths(self):
-        self.fail("test not written")
+        path = self.file_valid
+        self.assertTrue(os.path.exists(path), msg="Precondition!")
+
+        cmd = "{}".format(shlex.quote(path))
+        cmd = shlex.split(cmd)
+
+        args = self.parser.parse_args(cmd)
+
+        # Test1: args.xmls is a list
+        self.assertIsInstance(args.xmls, list)
+
+        # Test2: each item is a pathlib.PATHS
+        for item in args.xmls:
+            self.assertIsInstance(item, pathlib.Path)
 
     def test_parse_invalid_dir(self):
         cmd = "{}".format(shlex.quote(self.dir_invalid))
