@@ -85,10 +85,32 @@ class NextGenArgParse(object):
         return parser
 
     def get_args(self, search_dirs=True):
-        """Get the argument object parsed from the command line args."""
+        """Get the argument object parsed from the command line args.
+
+        kwargs:
+            search_dirs (bool): By default, directory positional arguments are
+                replaced with a series of XML files found within the directory.
+                Otherwise the directory will be left untouched.
+        return:
+            argparse.Namespace
+        """
         parser = self._make_parser()
         args = parser.parse_args()
-        return args
+        if search_dirs:
+            # Add files to a new list, clear and replace the original list.
+            new_list = []
+            for path in args.xmls:
+                if path.is_dir():
+                    files = self.searchdirectory(path)
+                    new_list.extend(files)
+                elif path.is_file():
+                    new_list.append(path)
+            args.xmls.clear()
+            for path in new_list:
+                args.xmls.append(path)
+            return args
+        else:
+            return args
 
 
 if __name__ == '__main__':
