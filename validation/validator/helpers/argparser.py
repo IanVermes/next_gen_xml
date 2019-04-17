@@ -6,7 +6,7 @@
 Copyright Ian Vermes 2018
 """
 
-from argparse import ArgumentParser, ArgumentTypeError
+import argparse as py_argparse
 
 import os
 import pathlib
@@ -25,12 +25,6 @@ class NextGenArgParse(object):
     The directory path should contain XML files with .xml file extensions at the
     next directory level. The search for .xml files is not recursive and hence
     will not search through subdirectories.
-
-    Usage:
-
-    >>> from argparse import ArgumentParser, ArgumentTypeError
-    >>> argparser = NextGenArgParse()
-    >>> kwargs = argparser.get_args()
     """
 
     GLOB_PATTERN = "*.xml"
@@ -55,19 +49,19 @@ class NextGenArgParse(object):
                     msg = (f"Got a directory '{str(filepath)}' which does not "
                            "contain any files that match the "
                            f"'{cls.GLOB_PATTERN}' pattern.")
-                    return_obj = ArgumentTypeError(msg)
+                    return_obj = py_argparse.ArgumentTypeError(msg)
             elif filepath.is_file():
                 if filepath.suffix in cls.GLOB_PATTERN:
                     return_obj = filepath
                 else:
                     msg = (f"Got a file '{str(filepath)}' which does not "
                            f"satisfy the '{cls.GLOB_PATTERN}' pattern.")
-                    return_obj = ArgumentTypeError(msg)
+                    return_obj = py_argparse.ArgumentTypeError(msg)
             else:
                 return_obj = TypeError(filepath)
         else:
             msg = f"Got the path '{filepath}' but it does not exist."
-            raise ArgumentTypeError(msg)
+            raise py_argparse.ArgumentTypeError(msg)
 
         if isinstance(return_obj, Exception):
             raise return_obj
@@ -76,7 +70,7 @@ class NextGenArgParse(object):
 
     def _make_parser(self):
         description = 'Validate XML in a directory against a schema and python encoded rules.'
-        parser = ArgumentParser(description=description)
+        parser = py_argparse.ArgumentParser(description=description)
         parser.add_argument("xmls",
                             metavar="PATHS",
                             nargs="+",
@@ -90,8 +84,18 @@ class NextGenArgParse(object):
                             help="If provided run in testmode")
         return parser
 
-    def get_args(self):
+    def get_args(self, search_dirs=True):
         """Get the argument object parsed from the command line args."""
         parser = self._make_parser()
         args = parser.parse_args()
         return args
+
+
+if __name__ == '__main__':
+    import sys
+    print("This is a visual test of this module.")
+    MSG_RAWARGS = (f"You called this script with these args:\n  {sys.argv}")
+    parser = NextGenArgParse()
+    args = parser.get_args()
+    MSG_PROCESSED = (f"The processed args are:\n  {vars(args)}")
+    print(MSG_RAWARGS)

@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import CommandLineTestCase
-from validator.helpers.argparse import NextGenArgParse
+from validator.helpers.argparser import NextGenArgParse
 
 import io
 import argparse

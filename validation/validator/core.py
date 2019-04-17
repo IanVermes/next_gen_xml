@@ -57,6 +57,6 @@ def main(directory, testmode=False):
 
 
 if __name__ == '__main__':
-    argparser = helpers.argparse.NextGenArgParse()
-    args = argparser.get_args()
-    main(args.directory, testmode=args.testmode)
+    parser = helpers.argparser.NextGenArgParse()
+    args = parser.get_args(search_dirs=True)
+    main(args.xmls, testmode=args.testmode)
