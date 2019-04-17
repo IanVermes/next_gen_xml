@@ -99,23 +99,6 @@ class CommandLineArgumentTest(CommandLineTestCase):
         self.assertIn(substring_1, stderr_output)
         self.assertIn(substring_2, stderr_output)
 
-    @unittest.expectedFailure
-    def test_parse_valid_file_rather_than_dir(self):
-        cmd = "{}".format(shlex.quote(self.file_valid))
-        cmd = shlex.split(cmd)
-        exit_code = 2
-        substring_1 = "error"
-        substring_2 = "Expected a directory not file"
-
-        with redirect_stderr(self.stderr_bypass):
-            with self.assertRaises(SystemExit) as context:
-                self.parser.parse_args(cmd)
-            stderr_output = self.stderr_bypass.getvalue()
-
-        self.assertEqual(context.exception.code, exit_code)
-        self.assertIn(substring_1, stderr_output)
-        self.assertIn(substring_2, stderr_output)
-
     def test_parse_no_argument(self):
         cmd = ""
         cmd = shlex.split(cmd)
