@@ -36,6 +36,13 @@ class NextGenArgParse(object):
     GLOB_PATTERN = "*.xml"
 
     @classmethod
+    def searchdirectory(cls, filename):
+        """Search a directory and retrieve xml files within."""
+        path = pathlib.Path(filename)
+        files = list(path.glob(cls.GLOB_PATTERN))
+        return files
+
+    @classmethod
     def is_valid_path(cls, filename):
         """Validate that the file or directory exists and not just a string."""
         filepath = pathlib.Path(filename)

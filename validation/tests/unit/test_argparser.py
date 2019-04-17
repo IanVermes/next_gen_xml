@@ -14,9 +14,34 @@ import argparse
 import unittest
 import shlex
 import os
+import glob
 import pathlib
 
 from contextlib import redirect_stderr
+
+
+class CommandLineClassMethods(CommandLineTestCase):
+
+    def test_method_searchdirectories_finds_xmls(self):
+        method = NextGenArgParse.searchdirectory
+        path = self.dir_valid
+        expected = glob.glob(os.path.join(path, "*.xml"))
+
+        result = method(path)
+
+        # Test1: returns a list
+        self.assertIsInstance(result, list)
+
+        # Test2: each list item is a pathlib.Path file with suffix .xml
+        self.assertGreater(len(result), 0, msg="Precondition!")
+        for item in result:
+            self.assertIsInstance(item, pathlib.Path)
+            self.assertTrue(item.is_file())
+            self.assertEqual(item.suffix.lower(), ".xml")
+
+        # Test3: list has same number of items as a glob.glob search for xml
+        self.assertEqual(len(expected), len(result))
+        self.assertListEqual(list(map(str, result)), expected)
 
 
 class CommandLineArgumentTest(CommandLineTestCase):
