@@ -37,11 +37,16 @@ class CommandLineTestCase(ExtendedTestCase):
         expanduser = os.path.expanduser
         abspath = os.path.abspath
         cls.dir_valid = abspath(expanduser("~/Desktop"))
-        cls.dir_invalid = abspath(expanduser("~/FooBar"))
-        cls.file_valid = abspath(expanduser("tests/resources/valid.xml"))
         assert os.path.isdir(cls.dir_valid)
-        assert not os.path.isdir(cls.dir_invalid)
+        cls.file_valid = abspath(expanduser("tests/resources/valid.xml"))
         assert os.path.isfile(cls.file_valid)
+        cls.file_wrongtype = abspath(expanduser(__file__))
+        assert os.path.isfile(cls.file_wrongtype)
+        cls.dir_invalid = abspath(expanduser("~/FooBar"))
+        assert not os.path.isdir(cls.dir_invalid)
+        cls.file_invalid = abspath(expanduser("~/FooBar/imaginaryfile.xml"))
+        assert not os.path.isfile(cls.file_invalid)
+
 
 
 class INIandSettingsTestCase(ExtendedTestCase):
