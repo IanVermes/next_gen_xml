@@ -115,9 +115,25 @@ class NextGenArgParse(object):
 
 if __name__ == '__main__':
     import sys
-    print("This is a visual test of this module.")
-    MSG_RAWARGS = (f"You called this script with these args:\n  {sys.argv}")
-    parser = NextGenArgParse()
-    args = parser.get_args()
-    MSG_PROCESSED = (f"The processed args are:\n  {vars(args)}")
+    import pprint
+    print("*** This is a visual test of this module.")
+    MSG_RAWARGS = ("*** You called this script with these args "
+                   f"(sys.argv):\n\t{sys.argv}")
     print(MSG_RAWARGS)
+
+    parser = NextGenArgParse()
+    try:
+        args_search = parser.get_args(search_dirs=True)
+        args_no_search = parser.get_args(search_dirs=False)
+    except SystemExit:
+        print("*** Use better testing args!")
+        raise
+    else:
+        detail_search = pprint.pformat(vars(args_search), indent=4)
+        detail_nosearch = pprint.pformat(vars(args_no_search), indent=4)
+        MSG_ARGSSEARCH = ("*** The processed args (search_dirs=True) are:"
+                          f"\n{detail_search}")
+        MSG_ARGSNOSEARCH = ("*** The processed args (search_dirs=False) are:"
+                            f"\n{detail_nosearch}")
+        print(MSG_ARGSSEARCH)
+        print(MSG_ARGSNOSEARCH)
