@@ -70,15 +70,27 @@ class CommandLineArgumentTest(CommandLineTestCase):
                 self.assertIn(substring_1, stderr_output)
                 self.assertIn(substring_2, stderr_output)
 
-    def test_parse_multiple_valid_dir(self):
-        self.fail("test not written")
+    def test_parse_multiple_args(self):
+        cmd_template = "{a} {b}"
+        params = {"multiple dirs": [self.dir_valid, self.dir_valid],
+                  "multiple files": [self.file_valid, self.file_valid],
+                  "multiple mixed": [self.file_valid, self.dir_valid],
+        }
+        for condition, paths in params.items():
+            path1, path2, *_ = paths
+            with self.subTest(condition=condition):
+                cmd = cmd_template.format(a=shlex.quote(path1),
+                                          b=shlex.quote(path2))
+                cmd = shlex.split(cmd)
 
-    def test_parse_multiple_valid_file(self):
-        self.fail("test not written")
+                args = self.parser.parse_args(cmd)
 
-    def test_parse_multiple_valid_files_dirs_mixed(self):
-        """Mixed positional args."""
-        self.fail("test not written")
+                # Test 1: only one item in args.xmls
+                self.assertEqual(len(args.xmls), len(paths))
+
+                # Test 2: the single args.xmls item == self.file_valid
+                args = list(map(str, args.xmls))
+                self.assertListEqual(args, paths)
 
     def test_parser_output_is_list_of_pathlibPaths(self):
         self.fail("test not written")
