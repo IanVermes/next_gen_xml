@@ -121,7 +121,7 @@ class CommandLineArgumentTest(CommandLineTestCase):
         cmd = shlex.split(cmd)
         exit_code = 2
         substring_1 = "error"
-        substring_2 = "the following arguments are required: DIR"
+        substring_2 = "the following arguments are required: PATHS"
 
         with redirect_stderr(self.stderr_bypass):  # Supress printing
             with self.assertRaises(SystemExit) as context:

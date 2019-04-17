@@ -72,7 +72,7 @@ class NextGenArgParse(object):
         parser = ArgumentParser(description=description)
         parser.add_argument("xmls",
                             metavar="PATHS",
-                            nargs="*",
+                            nargs="+",
                             type=lambda x: self.is_valid_path(x),
                             help=("Multiple positional arguments that consist of file or directory paths."
                                   "\n  Directory paths will be searched for XML."
