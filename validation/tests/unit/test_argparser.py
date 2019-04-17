@@ -47,6 +47,29 @@ class CommandLineArgumentTest(CommandLineTestCase):
                 item = args.xmls[0]
                 self.assertEqual(str(item), path)
 
+    def test_parse_nonexistant_paths(self):
+        files = {"file": self.file_invalid, "dir": self.dir_invalid}
+
+        exit_code = 2
+        substring_1 = "error"
+        substring_2 = "does not exist"
+
+        for path_type, path in files.items():
+            with self.subTest(path_type=path_type):
+                self.assertFalse(os.path.exists(path), msg="Precondition!")
+
+                cmd = "{}".format(shlex.quote(path))
+                cmd = shlex.split(cmd)
+
+                with redirect_stderr(self.stderr_bypass):
+                    with self.assertRaises(SystemExit) as context:
+                        self.parser.parse_args(cmd)
+
+                stderr_output = self.stderr_bypass.getvalue().lower()
+                self.assertEqual(context.exception.code, exit_code)
+                self.assertIn(substring_1, stderr_output)
+                self.assertIn(substring_2, stderr_output)
+
     def test_parse_multiple_valid_dir(self):
         self.fail("test not written")
 
