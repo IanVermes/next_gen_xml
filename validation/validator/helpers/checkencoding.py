@@ -9,6 +9,7 @@ Classes:
 Copyright Ian Vermes 2018
 """
 
+from helpers.result import ValidationResult
 import exceptions
 
 import chardet
