@@ -57,6 +57,28 @@ class TestSingletonMetaClass(ExtendedTestCase):
             except KeyError:
                 continue
 
+    def test_convenience_function_get_settings(self):
+        func = settings_handler.get_settings
+
+        singleton = func()
+
+        # Test1
+        self.assertIsInstance(singleton, settings_handler.Settings)
+        # Test2
+        other_singleton = func()
+        self.assertIs(singleton, other_singleton)
+
+    def test_convenience_function_get_configfile(self):
+        func = settings_handler.get_configfile
+        expected_ext = (".ini", ".cfg")
+
+        path = func()
+        actual_ext = str(path.suffix).lower()
+
+        self.assertIsInstance(path, pathlib.Path)
+        self.assertTrue(os.path.isfile(path))
+        self.assertIn(actual_ext, expected_ext)
+
     def test_instances_follow_singleton_pattern(self):
         instance1 = self.ExampleSingleton(self.arg)
         instance2 = self.ExampleSingleton(self.arg)

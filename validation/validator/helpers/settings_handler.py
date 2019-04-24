@@ -3,6 +3,13 @@
 
 """Reads a data config file to yield a data object with fixed attributes.
 
+Classes:
+    Settings
+
+Functions:
+    get_settings
+    get_configfile
+
 Copyright Ian Vermes 2018
 """
 
@@ -14,7 +21,9 @@ from lxml import etree
 
 import configparser
 import os
+import pathlib
 
+_RELATIVE_INI_PATH = pathlib.Path("../CORE_SETTINGS.ini")
 
 class Singleton(type):
     """A meta class for creating instance patterns.
@@ -139,3 +148,20 @@ class Settings(metaclass=Singleton):
         tree = etree.parse(filename)
         schema = etree.XMLSchema(tree)
         return schema
+
+
+def get_configfile():
+    config_file = _RELATIVE_INI_PATH
+    pyfile = helpers.path.expandpath(__file__, exists=True)
+    config_file = pyfile.parent.joinpath(config_file).resolve()
+    if not pyfile.exists():
+        raise exceptions.FileNotFound(str(config_file))
+    return config_file
+
+
+def get_settings(filename=None, mode=None):
+    if filename is None:
+        config_file = get_configfile()
+    else:
+        config_file = filename
+    return Settings(config_file, mode=mode)
