@@ -75,7 +75,8 @@ class XMLValidationAbstractCase(ExtendedTestCase):
     def setUpClass(cls):
         cls.invalid_attr = invalid = "illegal"
         cls.valid_attr = valid = "valid"
-        criteria = f"{valid} {invalid} syntax encoding document rules".split()
+        criteria = f"{valid} {invalid} syntax encoding document rules schema"
+        criteria = criteria.split()
         FileProperties = namedtuple("FileProperties", criteria)
 
         # Strings
