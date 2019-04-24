@@ -10,6 +10,8 @@ import exceptions
 import helpers.path
 from helpers.enum import Mode
 
+from lxml import etree
+
 import configparser
 import os
 
@@ -85,7 +87,11 @@ class Settings(metaclass=Singleton):
         self.__mode = self._get_enumareted_mode(mode)
         self.__config = self._get_config(config_filename)
         # Calculated attributes
-        self.__log_filename = self._attr_get_log_filename()
+        try:
+            self.__log_filename = self._attr_get_log_filename()
+            self.__schema = self._attr_get_schema_obj()
+        except Exception as err:
+            raise exceptions.SchemaSetupFailed from err
 
     def _get_value_from_config(self, option):
         value = self.__config.get(str(self.mode), option)
@@ -114,9 +120,22 @@ class Settings(metaclass=Singleton):
     def log_filename(self):
         return self.__log_filename
 
+    #
+    @property
+    def schema(self):
+        return self.__schema
+
     def _attr_get_log_filename(self):
         option = "log_filename"
         filename = self._get_value_from_config(option)
         filename = helpers.path.expandpath(filename,
                                            exists=False, dir_exists=True)
         return filename
+
+    def _attr_get_schema_obj(self):
+        option = "schema"
+        filename = self._get_value_from_config(option)
+        filename = str(helpers.path.expandpath(filename, exists=True))
+        tree = etree.parse(filename)
+        schema = etree.XMLSchema(tree)
+        return schema

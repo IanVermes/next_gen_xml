@@ -13,6 +13,11 @@ Copyright Ian Vermes 2018
 class NextGenError(Exception):
     """Base exception for this package."""
 
+# Settings/singleton operations
+
+class SchemaSetupFailed(NextGenError):
+    """Could not setup the Settings singleton."""
+
 # File operations
 
 class FileNotFound(NextGenError):

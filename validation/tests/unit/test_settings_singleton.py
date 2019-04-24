@@ -10,6 +10,8 @@ from tests.base_testcases import INIandSettingsTestCase, ExtendedTestCase
 from helpers import settings_handler
 import exceptions  # from validator import exceptions
 
+from lxml import etree
+
 import unittest
 import os
 import time
@@ -126,7 +128,7 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         cls.inifile = cls.find_and_get_path(
             INI_PARTIAL_NAME, PACKAGE_DIRECTORY)
 
-        cls.expected_attributes = ("log_filename", "mode")
+        cls.expected_attributes = ("log_filename", "mode", "schema")
 
     def tearDown(self):
         # Reset the singleton so that singletons created between tests are unique.
@@ -190,7 +192,7 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         singleton = settings_handler.Settings(self.inifile)
         var = singleton.log_filename
 
-        dest_dir = os.path.dirname(singleton.log_filename)
+        dest_dir = os.path.dirname(var)
         isAbsolute = dest_dir.startswith("/")
         isExpandedUser = "~" in dest_dir
 
@@ -198,6 +200,14 @@ class TestSettingsDataSingleton(INIandSettingsTestCase):
         self.assertTrue(os.path.isdir(dest_dir), f"Dir: {dest_dir}")
         self.assertTrue(isAbsolute, f"Dir: {dest_dir} is not an absolute path.")
         self.assertFalse(isExpandedUser, f"Dir: {dest_dir} needs userexpansion.")
+
+    def test_specific_attribute_SCHEMA(self):
+        singleton = settings_handler.Settings(self.inifile)
+        var = singleton.schema
+
+        expected_type = etree.XMLSchema
+
+        self.assertIsInstance(var, expected_type)
 
 
 class TestSettingsDataSingleton_Mode_Kwarg(INIandSettingsTestCase):
