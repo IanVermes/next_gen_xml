@@ -12,6 +12,14 @@ Functions:
 Copyright Ian Vermes 2019
 """
 
+from helpers.settings_handler import get_settings
+
+from lxml import etree
+
+
+SETTINGS = get_settings()
+SCHEMA = SETTINGS.schema
+
 
 class SchemaOperations:
     pass
