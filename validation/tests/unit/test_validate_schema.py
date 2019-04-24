@@ -17,13 +17,14 @@ import exceptions
 
 import unittest
 
+
 class TestSchemaValidation(XMLValidation.TestCase):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.criterion = criterion = "schema"
-        cls.base_exc = exceptions.SyntaxValidationError
+        cls.base_exc = exceptions.SchemaValidationError
         cls.valid_file = next(cls.get_resources_by_criterion("valid"))
         cls.illegal_file = next(cls.get_resources_by_criterion(criterion))
         cls.result_type = ValidationResult
