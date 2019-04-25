@@ -27,10 +27,21 @@ class SchemaOperations:
     pass
 
 
+def parse_xml(filename, *args, **kwargs):
+    if isinstance(filename, etree._Element):
+        tree = filename.getroottree()
+    elif isinstance(filename, etree._ElementTree):
+        tree = filename
+    else:
+        filename = str(filename)
+        tree = etree.parse(filename, *args, **kwargs)
+    return tree
+
+
 def validate_schema(filename):
     try:
         try:
-            tree = etree.parse(filename)
+            tree = parse_xml(filename)
             SCHEMA.assertValid(tree)
         except etree.DocumentInvalid as cause:
             raise exceptions.SchemaValidationError() from cause
