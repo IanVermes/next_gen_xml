@@ -9,7 +9,7 @@ Copyright Ian Vermes 2018
 from tests.base_testcases import ExtendedTestCase
 from tests.validation_testcases import ValidationTestCase
 from helpers.checkschema import SchemaOperations, validate_schema
-from helpers.enum import EncodingErrorCode
+from helpers.enum import Passing
 from helpers.result import ValidationResult
 
 from lxml import etree
@@ -28,8 +28,9 @@ class TestValidateSchemaFunction(ValidationTestCase, unittest.TestCase):
     def setUpClass(cls):
         resource = "tests/resources/schema"
         func = validate_schema
+        failing_enum = Passing.SCHEMA
 
-        cls.preSetup(directory=resource, validator=func)
+        cls.preSetup(directory=resource, validator=func, enum=failing_enum)
         cls.resource_dict = cls.get_resources()
 
     # Test specific to the schema_validator go here

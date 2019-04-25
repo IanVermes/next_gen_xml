@@ -87,7 +87,7 @@ class ValidationTestCase():
                 # Test2
                 self.assertFalse(result)
                 # Test3
-                expected = Passing.SYNTAX
+                expected = self.failing_enum
                 self.assertEqual(expected, result.enum)
 
     def test_validator_input_arg_does_not_raise_TypeError(self):
@@ -111,9 +111,8 @@ class ValidationTestCase():
                            f"type {usagetype}. Reason: {err}")
                     raise AssertionError(msg) from None
 
-
     @classmethod
-    def preSetup(cls, directory, validator):
+    def preSetup(cls, directory, validator, enum):
         msg = cls._PRECONDITION_TEMPLATE
         assert inspect.isfunction(validator), msg.format(str(validator))
         cls.validator = functools.partial(validator)
@@ -125,6 +124,9 @@ class ValidationTestCase():
         passing_directory = pathlib.Path("tests/resources/valid")
         assert passing_directory.exists(), msg.format(str(passing_directory))
         cls.passing_directory = passing_directory
+
+        assert isinstance(enum, Passing), msg.format(str(enum))
+        cls.failing_enum = enum
 
     @classmethod
     @preSetupCheck
