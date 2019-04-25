@@ -72,6 +72,10 @@ class ValidationResult(object):
             raise TypeError(msg)
 
     @property
+    def enum(self):
+        return self._this_enum
+
+    @property
     def filename(self):
         return self._filename
 
