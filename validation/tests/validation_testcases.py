@@ -88,7 +88,26 @@ class ValidationTestCase():
                 self.assertEqual(expected, result.enum)
 
     def test_validator_input_arg_does_not_raise_TypeError(self):
-        self.fail("not written")
+        validator = self.validator
+        xml = self.resource_dict[True][0]  # Only need 1 file
+        types = [str(xml),
+                 pathlib.Path(xml),
+                 etree.parse(str(xml)),
+                 etree.parse(str(xml)).getroot()
+        ]
+
+        for usage in types:
+            usagetype = type(usage).__name__
+            with self.subTest(usagetype=usagetype):
+                try:
+                    validator(usage)
+                except TypeError as err:
+                    detail = str(err)
+                    funcname = validator.func.__name__
+                    msg = (f"{funcname} does not accept arguments with "
+                           f"type {usagetype}. Reason: {err}")
+                    raise AssertionError(msg) from None
+
 
     @classmethod
     def preSetup(cls, directory, validator):
