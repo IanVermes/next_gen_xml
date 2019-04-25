@@ -26,7 +26,7 @@ class TestValidateSchemaFunction(ValidationTestCase, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        resource = "../resources/schema"
+        resource = "tests/resources/schema"
         func = validate_schema
 
         cls.preSetup(directory=resource, validator=func)
