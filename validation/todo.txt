@@ -1,13 +1,14 @@
 TODO
 ----
-Validation tests need their own testcase
+Generic validation tests needs to be checked against validate_syntax
+validate_schema/validate_syntax should raise a special error if they dont get a pass or their desired error type. i.e. support for uncategorized failure.
+Add/test new enum for uncategorized failure
 Create a generic function that validate_schema/validate_syntax could inherit from? Wrap around?
 Group validation functions in master checking class (MCC)
 MCC has a feed_in method thats takes a file a time and validates it
 MCC orders the validation methods as a serial process
 Integrate checkschema.parse_xml into all functions that use etree.parse to support pathlib better
 Refactor checkschema.parse_xml to use functools.lrucache
-Add/test new enum for uncategorized failure
 Log uncategorized failures
 validate_encoding - tests need to be reworked/resource dependencies fixed
 
