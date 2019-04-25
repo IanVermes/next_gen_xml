@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""A TestCase for XML validation that depends on resource files."""
+"""A TestCase for XML validation that depends on resource files.
+
+Decorators:
+    preSetupCheck
+
+Classes:
+    ValidationTestCase
+"""
 
 import tests.base_testcases
 
@@ -13,6 +20,7 @@ import pathlib
 
 
 def preSetupCheck(func):
+    """A decorator that gives a more useful reason why an error arose."""
     functools.wraps(func)
     def decorator(*args, **kwargs):
         try:
@@ -27,6 +35,24 @@ def preSetupCheck(func):
 
 
 class ValidationTestCase():
+    """This class should be multiply inherited with unittest.TestCase.
+
+    This class should be the first positional argument in the class defintion.
+
+    Tests:
+        test_validator_passes_valid_files
+        test_validator_fails_illegal_files
+        test_validator_input_arg_does_not_raise_TypeError
+
+    Class methods:
+        preSetup: Should be called inside the classSetup method of the child
+            class. It initialises the test cases with helpful attributes like
+            the validation function and the file resources necessary for tests
+        find_xml: Convenience method. Finds files in a directory that are both
+            XML files and also share the direcory name in the file name.
+        get_resources: Returns a dictionary with both valid and illegal XML. The
+            illegal files are discovered conditionally if preSetup was called.
+    """
 
     _PRECONDITION_TEMPLATE = "Precondition failed: {}"
     _GLOB_XML_PATTERN = "*.xml"
