@@ -38,7 +38,7 @@ class CommandLineTestCase(ExtendedTestCase):
         abspath = os.path.abspath
         cls.dir_valid = abspath(expanduser("~/Desktop"))
         assert os.path.isdir(cls.dir_valid)
-        cls.file_valid = abspath(expanduser("tests/resources/valid.xml"))
+        cls.file_valid = abspath(expanduser("tests/resources/valid/valid.xml"))
         assert os.path.isfile(cls.file_valid)
         cls.file_wrongtype = abspath(expanduser(__file__))
         assert os.path.isfile(cls.file_wrongtype)

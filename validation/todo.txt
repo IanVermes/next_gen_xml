@@ -1,6 +1,5 @@
 TODO
 ----
-Reorganise testing resources
 Validation tests need their own testcase
 Create a generic function that validate_schema/validate_syntax could inherit from? Wrap around?
 Group validation functions in master checking class (MCC)
