@@ -68,7 +68,7 @@ class ValidationTestCase():
     def preSetup(cls, directory, validator):
         msg = cls._PRECONDITION_TEMPLATE
         assert inspect.isfunction(validator), msg.format(str(validator))
-        cls.validator = validator
+        cls.validator = functools.partial(validator)
 
         directory = pathlib.Path(directory)
         assert directory.exists(), msg.format(str(directory))
