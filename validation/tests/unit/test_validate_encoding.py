@@ -20,6 +20,9 @@ import unittest
 from itertools import chain
 
 
+REASON = "this test will be reworked - xml validation framework change"
+
+@unittest.skip(REASON)
 class TestSyntaxErrorEncodingHandler(XMLValidationAbstractCase):
 
     @classmethod
@@ -101,7 +104,7 @@ class TestSyntaxErrorEncodingHandler(XMLValidationAbstractCase):
                 else:
                     self.assertEqual(this_enum, expeted_enum)
 
-
+@unittest.skip(REASON)
 class TestEncodingOperations(XMLValidationAbstractCase):
 
     @classmethod

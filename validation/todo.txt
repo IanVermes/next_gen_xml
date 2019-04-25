@@ -8,5 +8,5 @@ MCC has a feed_in method thats takes a file a time and validates it
 MCC orders the validation methods as a serial process
 Add/test new enum for uncategorized failure
 Log uncategorized failures
-
+validate_encoding - tests need to be reworked/resource dependencies fixed
 

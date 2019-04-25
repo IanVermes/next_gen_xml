@@ -14,7 +14,9 @@ import exceptions
 import os
 import unittest
 
+REASON = "this test is to be deprecated - xml validation framework change"
 
+@unittest.skip(REASON)
 class Test_XMLValidationTestCase_Itself(XMLValidationAbstractCase):
     """This TestCase has a complicated setUpClass method and needs vetting."""
 
