@@ -7,6 +7,7 @@ Copyright Ian Vermes 2018
 """
 
 from tests.base_testcases import ExtendedTestCase
+from tests.validation_testcases import ValidationTestCase
 from helpers.checkschema import SchemaOperations, validate_schema
 from helpers.enum import EncodingErrorCode
 from helpers.result import ValidationResult
@@ -17,6 +18,22 @@ import exceptions
 
 import unittest
 import sys
+
+
+class TestValidateSchemaFunction(ValidationTestCase, unittest.TestCase):
+    """Some test methods are written in the first parent class
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        resource = "../resources/schema"
+        func = validate_schema
+
+        cls.preSetup(directory=resource, validator=func)
+        cls.resource_dict = cls.get_resources()
+
+    # Test specific to the schema_validator go here
+
 
 
 class TestSchemaDependency(ExtendedTestCase):
