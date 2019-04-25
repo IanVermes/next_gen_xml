@@ -14,9 +14,12 @@ import tests.base_testcases
 from helpers.result import ValidationResult
 from helpers.enum import Passing
 
+from lxml import etree
+
 import functools
 import inspect
 import pathlib
+import unittest
 
 
 def preSetupCheck(func):
