@@ -20,7 +20,7 @@ import unittest
 import sys
 
 
-class TestValidateSchemaFunction(ValidationTestCase, unittest.TestCase):
+class TestValidateSchemaFunction(ValidationTestCase, ExtendedTestCase):
     """Some test methods are written in the first parent class
     """
 
