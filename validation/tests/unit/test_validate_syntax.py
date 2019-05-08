@@ -17,7 +17,7 @@ from lxml import etree
 import unittest
 
 
-class TestValidateSchemaFunction(ValidationTestCase, ExtendedTestCase):
+class TestValidateSyntaxFunction(ValidationTestCase, ExtendedTestCase):
     """Some test methods are written in the first parent class
     """
 
