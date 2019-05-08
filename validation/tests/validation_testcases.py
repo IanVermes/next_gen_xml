@@ -96,6 +96,19 @@ class ValidationTestCase():
                 expected = self.failing_enum
                 self.assertEqual(expected, result.enum)
 
+    def test_validator_has_function_attribute_for_sorting(self):
+        expected_attribute = "key"
+        expected_type = Passing
+        validator = self.validator
+
+        # Test1
+        self.assertHasAttr(validator, expected_attribute)
+
+        # Test2
+        attribute_value = getattr(validator, expected_attribute)
+        self.assertIsInstance(attribute_value, expected_type)
+
+
     def test_validator_input_arg_does_not_raise_TypeError(self):
         validator = self.validator
         xml = self.resource_dict[True][0]  # Only need 1 file
