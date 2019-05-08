@@ -11,4 +11,8 @@ Integrate checkschema.parse_xml into all functions that use etree.parse to suppo
 Refactor checkschema.parse_xml to use functools.lrucache
 Log uncategorized failures
 validate_encoding - tests need to be reworked/resource dependencies fixed
-
+Validation result has error info object as attribute
+Error info object has truthyness related to data completeness
+Generate report from error. 
+Generate improved report from error info object
+Generate report falls back upon exception object instead of error info object if error obj is is false
