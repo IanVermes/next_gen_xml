@@ -5,8 +5,6 @@
 
 Classes:
     SchemaOperations
-
-Functions:
     validate_schema
 
 Copyright Ian Vermes 2019
@@ -14,6 +12,7 @@ Copyright Ian Vermes 2019
 
 from helpers.result import ValidationResult
 from helpers.settings_handler import get_settings
+from helpers.enum import Passing
 import exceptions
 
 from lxml import etree
@@ -27,6 +26,14 @@ class SchemaOperations:
     pass
 
 
+class validate_schema(object):
+
+    def __new__(self, filename):
+        return _validate_schema(filename)
+
+    key = Passing.SCHEMA
+
+
 def parse_xml(filename, *args, **kwargs):
     if isinstance(filename, etree._Element):
         tree = filename.getroottree()
@@ -38,7 +45,7 @@ def parse_xml(filename, *args, **kwargs):
     return tree
 
 
-def validate_schema(filename):
+def _validate_schema(filename):
     try:
         try:
             tree = parse_xml(filename)

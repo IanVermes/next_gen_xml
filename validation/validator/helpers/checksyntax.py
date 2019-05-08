@@ -3,13 +3,14 @@
 """A collection of classes & functions for validating XML syntax.
 
 
-Classes:
-    EncodingOperations
+Class:
+    validate_syntax
 
-Copyright Ian Vermes 2018
+Copyright Ian Vermes 2019
 """
 
 from helpers.result import ValidationResult
+from helpers.enum import Passing
 import exceptions
 
 import chardet
@@ -17,7 +18,17 @@ from lxml import etree
 
 MY_PARSER = etree.XMLParser(encoding=None)
 
-def validate_syntax(filename):
+
+
+class validate_syntax(object):
+
+    def __new__(self, filename):
+        return _validate_syntax(filename)
+
+    key = Passing.SYNTAX
+
+
+def _validate_syntax(filename):
     try:
         causalgrp = (etree.XMLSyntaxError, exceptions.EncodingOperationError)
         try:

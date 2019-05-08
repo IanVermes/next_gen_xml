@@ -99,7 +99,7 @@ class ValidationTestCase():
     def test_validator_has_function_attribute_for_sorting(self):
         expected_attribute = "key"
         expected_type = Passing
-        validator = self.validator
+        validator = self.validator.func
 
         # Test1
         self.assertHasAttr(validator, expected_attribute)
@@ -133,7 +133,7 @@ class ValidationTestCase():
     @classmethod
     def preSetup(cls, directory, validator, enum):
         msg = cls._PRECONDITION_TEMPLATE
-        assert inspect.isfunction(validator), msg.format(str(validator))
+        assert inspect.isclass(validator), msg.format(str(validator))
         cls.validator = functools.partial(validator)
 
         directory = pathlib.Path(directory)
