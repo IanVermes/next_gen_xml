@@ -7,7 +7,7 @@ Copyright Ian Vermes 2018
 """
 from tests.base_testcases import ExtendedTestCase
 from tests.validation_testcases import ValidationTestCase
-from helpers.checkencoding import validate_syntax, raise_if_mismatched_encodings
+from helpers.checksyntax import validate_syntax, raise_if_mismatched_encodings
 from helpers.enum import Passing
 from helpers.result import ValidationResult
 import exceptions
