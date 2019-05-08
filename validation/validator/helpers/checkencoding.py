@@ -159,15 +159,13 @@ MY_PARSER = etree.XMLParser(encoding=None)
 
 def validate_syntax(filename):
     try:
+        causalgrp = (etree.XMLSyntaxError, exceptions.EncodingOperationError)
         try:
             etree.parse(str(filename), parser=MY_PARSER)
-            # TODO Mismatched encoded files will slip through without raising an
-            # exception. It is at this point that you examine for mismatch.
-            # Mismatches should raise either ERR_DOCUMENT_EMPTY:4 or
-            # ERR_INVALID_ENCODING:81.
+            # Files with mismatched encodings may silently pass without raising
+            # an exception.
             raise_if_mismatched_encodings(filename)
-        except etree.XMLSyntaxError as cause:
-            cause = handle_encoding_errors(filename, cause)
+        except causalgrp as cause:
             raise exceptions.SyntaxValidationError() from cause
     except exceptions.SyntaxValidationError as exc:
         exception = exc
@@ -178,43 +176,26 @@ def validate_syntax(filename):
 
 
 def raise_if_mismatched_encodings(filename):
-    raise NotImplementedError("Read TODO comments in validate_syntax() and handle_encoding_errors().")
+    """Raises an exceptions if the zeroth line encoding & rest of file mismatch.
 
+    Exceptions:
+        exceptions.EncodingOperationError
+    """
+    key = "encoding"
+    with open(filename, "rb") as handle:
+        # Get zeroth line encoding
+        line = handle.readline()
+        zeroth_enc = chardet.detect(line)[key]
+        # Get encoding of the rest of the file.
+        detector = chardet.UniversalDetector()
+        for line in handle:
+            detector.feed(line)
+            if detector.done:
+                break
+        detector.close()
+        rest_enc = detector.result[key]
 
-def handle_encoding_errors(filename, cause):
-    if not isinstance(cause, etree.XMLSyntaxError):
-        msg = f"Only handles etree.XMLSyntaxError errors not {repr(cause)}"
-        raise TypeError(msg)
-    # TODO     NOT_ENCODING_ERR:0 is a superset of ERR_DOCUMENT_EMPTY:4. The
-    # ERR_DOCUMENT_EMPTY:4 may silently pass when the parser encoding is not set
-    # and will choose an appropriate encoding. However we are still letting
-    # mismathed encoding slip through. Such events indcate the file is invalid.
-
-    return cause
-
-def validate_encoding(filename):
-    raise DeprecationWarning("Mothball this function.")
-    get_encodings = EncodingOperations.get_detected_and_declared_encoding
-    try:
-        try:
-            detected_enc, declared_enc = get_encodings(filename)
-        except exceptions.EncodingOperationError as cause:
-            msg = ""
-            raise exceptions.EncodingValidationError(msg) from cause
-        except exceptions.UnexpectedDeclarationAbsent as cause:
-            msg = ""
-            raise exceptions.EncodingValidationError(msg) from cause
-        except ValueError as cause:
-            msg = ""
-            raise exceptions.EncodingValidationError(msg) from cause
-        mismatched_encoding = (detected_enc != declared_enc)
-        if mismatched_encoding:
-            msg = ""
-            cause = exceptions.EncodingOperationError()
-            raise exceptions.EncodingValidationError(msg) from cause
-    except exceptions.EncodingValidationError as exc:
-        exception = exc
-    else:
-        exception = None
-    result = ValidationResult(filename, exception)
-    return result
+    if zeroth_enc != rest_enc:
+        msg = ("The file encoding in the declaration and the encoding differ: "
+               "zeroth line={zeroth_enc} & other liens={rest_enc}.")
+        raise exceptions.EncodingOperationError(msg)
