@@ -17,7 +17,6 @@ from lxml import etree
 import unittest
 
 
-# @unittest.skip("skip")
 class TestValidateSchemaFunction(ValidationTestCase, ExtendedTestCase):
     """Some test methods are written in the first parent class
     """

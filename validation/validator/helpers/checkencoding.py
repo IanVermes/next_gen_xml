@@ -160,7 +160,7 @@ MY_PARSER = etree.XMLParser(encoding=None)
 def validate_syntax(filename):
     try:
         try:
-            etree.parse(filename, parser=MY_PARSER)
+            etree.parse(str(filename), parser=MY_PARSER)
             # TODO Mismatched encoded files will slip through without raising an
             # exception. It is at this point that you examine for mismatch.
             # Mismatches should raise either ERR_DOCUMENT_EMPTY:4 or
