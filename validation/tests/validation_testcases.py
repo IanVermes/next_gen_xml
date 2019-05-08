@@ -47,6 +47,12 @@ class ValidationTestCase():
         test_validator_fails_illegal_files
         test_validator_input_arg_does_not_raise_TypeError
 
+    Class attrs:
+        resource_dict[True]: Expected to pass files.
+        resource_dict[False]: Expected to fail files.
+        failing_directory
+        passing_directory
+
     Class methods:
         preSetup: Should be called inside the classSetup method of the child
             class. It initialises the test cases with helpful attributes like
