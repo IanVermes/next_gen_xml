@@ -1,11 +1,5 @@
 TODO
 ----
-Create a generic function that validate_schema/validate_syntax could inherit from? Wrap around?
-validate_schema/validate_syntax should inherit from a metaclass with a __call__:
-	https://stackoverflow.com/questions/6966772/using-the-call-method-of-a-metaclass-instead-of-new
-
---
-
 Group validation functions in master checking class (MCC)
 MCC has a feed_in method thats takes a file a time and validates it
 MCC orders the validation methods as a serial process

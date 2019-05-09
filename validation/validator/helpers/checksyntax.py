@@ -11,6 +11,7 @@ Copyright Ian Vermes 2019
 
 from helpers.result import ValidationResult
 from helpers.enum import Passing
+from helpers._check_shared import SortableCallable
 import exceptions
 
 import chardet
@@ -19,13 +20,22 @@ from lxml import etree
 MY_PARSER = etree.XMLParser(encoding=None)
 
 
+class validate_syntax(metaclass=SortableCallable):
+    """Check that an XML file has valid syntax.
 
-class validate_syntax(object):
-
-    def __new__(self, filename):
-        return _validate_syntax(filename)
+    Attr:
+        key(Passing enum): This is a sortable function-like class.
+    Arg:
+        filename(str, pathlib.Path)
+    Return:
+        ValdiationResult
+    """
 
     key = Passing.SYNTAX
+
+    @classmethod
+    def _veneer(cls, filename):
+        return _validate_syntax(filename)
 
 
 def _validate_syntax(filename):
