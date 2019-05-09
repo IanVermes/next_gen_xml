@@ -60,7 +60,7 @@ class TestChecker(ExtendedTestCase):
         method = getattr(checker, method_name)
 
         # Test3 - extant files yield validation result
-        input_files = self.files[True][0], self.files[False][0]
+        input_files = self.resources[True][0], self.resources[False][0]
 
         for input_file in input_files:
             basename = os.path.basename(input_file)
