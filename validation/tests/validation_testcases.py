@@ -101,12 +101,15 @@ class ValidationTestCase():
         expected_type = Passing
         validator = self.validator.func
 
-        # Test1
+        # Test1 - correct attribute
         self.assertHasAttr(validator, expected_attribute)
 
-        # Test2
+        # Test2 - attribute is correct type
         attribute_value = getattr(validator, expected_attribute)
         self.assertIsInstance(attribute_value, expected_type)
+
+        # Test3 - value of attribute corresponds to the test suites failing_enum
+        self.assertEqual(attribute_value, self.failing_enum)
 
 
     def test_validator_input_arg_does_not_raise_TypeError(self):
